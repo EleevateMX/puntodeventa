@@ -99,11 +99,15 @@ function formatElapsed(ms: number): string {
   return `${minutes}:${seconds.toString().padStart(2, '0')}`
 }
 
+function elapsedMinutes(ms: number): number {
+  return ms / 1000 / 60
+}
+
 function elapsedColor(ms: number): string {
-  const minutes = ms / 1000 / 60
-  if (minutes < 3) return 'text-green-400'
-  if (minutes < 7) return 'text-yellow-400'
-  return 'text-red-400'
+  const minutes = elapsedMinutes(ms)
+  if (minutes < 3) return 'text-sa-mint'
+  if (minutes < 7) return 'text-sa-mango'
+  return 'text-sa-strawberry'
 }
 
 function sortOrdenes(ordenes: Orden[]): Orden[] {
@@ -113,6 +117,13 @@ function sortOrdenes(ordenes: Orden[]): Orden[] {
     if (pd !== 0) return pd
     return new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
   })
+}
+
+function formatClock(d: Date): string {
+  const hh = d.getHours().toString().padStart(2, '0')
+  const mm = d.getMinutes().toString().padStart(2, '0')
+  const ss = d.getSeconds().toString().padStart(2, '0')
+  return `${hh}:${mm}:${ss}`
 }
 
 function playBeep() {
@@ -142,15 +153,21 @@ const CANAL_LABELS: Record<Canal, string> = {
   delivery: 'Delivery',
 }
 
+const CANAL_EMOJI: Record<Canal, string> = {
+  mesa: '🍽️',
+  kiosko: '🖥️',
+  delivery: '🛵',
+}
+
 const CANAL_CLASSES: Record<Canal, string> = {
-  mesa: 'bg-purple-800 text-purple-200',
-  kiosko: 'bg-cyan-800 text-cyan-200',
-  delivery: 'bg-pink-800 text-pink-200',
+  mesa: 'bg-sa-mint text-sa-green-ink',
+  kiosko: 'bg-sa-blueberry text-white',
+  delivery: 'bg-sa-mango text-white',
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export function PantallaComandas({ cocinaSlug, titulo, color }: Props) {
+export function PantallaComandas({ cocinaSlug, titulo, color: _color }: Props) {
   const [ordenes, setOrdenes] = useState<Orden[]>(DEMO_ORDENES)
   const [now, setNow] = useState(Date.now())
   const [fadingOut, setFadingOut] = useState<Set<string>>(new Set())
@@ -175,8 +192,6 @@ export function PantallaComandas({ cocinaSlug, titulo, color }: Props) {
   }, [ordenes])
 
   // Supabase real-time subscription (only when env vars are configured).
-  // Dynamic import uses a runtime string so TypeScript never resolves the
-  // broken supabase package types during compilation of this file.
   useEffect(() => {
     const meta = (import.meta as unknown as Record<string, Record<string, unknown>>)
     const env = meta['env'] ?? {}
@@ -209,7 +224,6 @@ export function PantallaComandas({ cocinaSlug, titulo, color }: Props) {
 
     async function init() {
       try {
-        // Use a variable so static analysis tools don't resolve the module
         const mod = await import(/* @vite-ignore */ PKG)
         await loadOrdenes(mod)
         channel = mod.suscribirseAOrdenes(cocinaSlug, () => loadOrdenes(mod))
@@ -247,62 +261,94 @@ export function PantallaComandas({ cocinaSlug, titulo, color }: Props) {
     }, 3000)
   }
 
-  const colorClasses = {
-    orange: {
-      header: 'bg-orange-600',
-      badge: 'bg-orange-500',
-      btn: 'bg-orange-500 hover:bg-orange-600',
-      btnPrep: 'bg-orange-700 hover:bg-orange-800',
-    },
-    blue: {
-      header: 'bg-blue-600',
-      badge: 'bg-blue-500',
-      btn: 'bg-blue-500 hover:bg-blue-600',
-      btnPrep: 'bg-blue-700 hover:bg-blue-800',
-    },
-  }[color]
-
   const sorted = sortOrdenes(ordenes)
 
   const enEspera = ordenes.filter((o) => o.estado === 'nueva').length
   const preparando = ordenes.filter((o) => o.estado === 'en_preparacion').length
   const listasHoy = ordenes.filter((o) => o.estado === 'lista').length
 
+  const clock = formatClock(new Date(now))
+
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col">
+    <div className="min-h-screen bg-sa-green-ink flex flex-col font-body">
       {/* ── Header ── */}
-      <header className={`${colorClasses.header} px-6 py-4`}>
-        <div className="flex items-center justify-between mb-3">
-          <h1 className="text-2xl font-bold text-white">{titulo}</h1>
-          <div className="flex items-center gap-3">
-            <span className="w-3 h-3 rounded-full bg-green-400 animate-pulse" />
-            <span className="text-green-300 text-sm font-medium">En vivo</span>
+      <header className="px-6 py-4 bg-sa-green-deep border-b border-sa-cream/10">
+        <div className="flex items-center justify-between gap-6">
+          {/* Left: logo */}
+          <div className="flex items-center gap-4 shrink-0">
+            <img
+              src="/logo.png"
+              alt="Shake Aholic"
+              className="h-16 w-auto drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]"
+            />
+          </div>
+
+          {/* Center: title */}
+          <div className="flex-1 text-center">
+            <h1 className="font-display text-sa-cream text-3xl md:text-4xl tracking-wide leading-none">
+              {titulo}
+            </h1>
+            <p className="font-mono text-sa-cream/50 text-xs mt-1 uppercase tracking-widest">
+              Kitchen Display · En vivo
+            </p>
+          </div>
+
+          {/* Right: clock + live dot */}
+          <div className="flex items-center gap-3 shrink-0">
+            <span className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-sa-mint animate-pulse" />
+              <span className="font-mono text-sa-cream/70 text-xl tabular-nums">{clock}</span>
+            </span>
           </div>
         </div>
+
         {/* Stats row */}
-        <div className="flex gap-4">
-          <StatPill count={enEspera} label="en espera" colorClass="bg-orange-500/30 text-orange-200" />
-          <StatPill count={preparando} label="preparando" colorClass="bg-yellow-500/30 text-yellow-200" />
-          <StatPill count={listasHoy} label="listas hoy" colorClass="bg-green-500/30 text-green-200" />
+        <div className="flex flex-wrap gap-3 mt-4 justify-center md:justify-end">
+          <StatPill
+            count={enEspera}
+            label="En espera"
+            bg="bg-sa-strawberry"
+            text="text-white"
+            pulseNumber
+          />
+          <StatPill
+            count={preparando}
+            label="Preparando"
+            bg="bg-sa-banana"
+            text="text-sa-coffee"
+          />
+          <StatPill
+            count={listasHoy}
+            label="Listas hoy"
+            bg="bg-sa-mint"
+            text="text-sa-green-ink"
+          />
         </div>
       </header>
 
       {/* ── Main ── */}
       <main className="flex-1 p-6">
         {sorted.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-96 text-gray-600 gap-4">
-            <span className="text-7xl">✅</span>
-            <p className="text-2xl font-semibold">Todo al día</p>
-            <p className="text-sm">Las nuevas órdenes aparecerán aquí automáticamente</p>
+          <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6 text-center">
+            <img
+              src="/milo-transparent.png"
+              alt="Milo descansando"
+              className="w-[280px] h-auto opacity-90 drop-shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
+            />
+            <p className="font-display text-sa-cream text-4xl md:text-5xl tracking-wide">
+              Todo limpio. A descansar.
+            </p>
+            <p className="font-mono text-sa-cream/50 text-sm uppercase tracking-widest">
+              Las órdenes nuevas aparecerán aquí
+            </p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {sorted.map((orden) => (
               <OrdenCard
                 key={orden.id}
                 orden={orden}
                 now={now}
-                colorClasses={colorClasses}
                 isFadingOut={fadingOut.has(orden.id)}
                 onIniciarPreparacion={iniciarPreparacion}
                 onMarcarLista={marcarLista}
@@ -320,16 +366,26 @@ export function PantallaComandas({ cocinaSlug, titulo, color }: Props) {
 function StatPill({
   count,
   label,
-  colorClass,
+  bg,
+  text,
+  pulseNumber = false,
 }: {
   count: number
   label: string
-  colorClass: string
+  bg: string
+  text: string
+  pulseNumber?: boolean
 }) {
   return (
-    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold ${colorClass}`}>
-      <span className="text-base font-extrabold">{count}</span>
-      {label}
+    <span className={`inline-flex items-center gap-2.5 pl-2 pr-4 py-1.5 rounded-sa ${bg} ${text} shadow-sa-sm`}>
+      <span
+        className={`font-display text-2xl leading-none min-w-[2rem] text-center px-2 ${
+          pulseNumber ? 'animate-pulse' : ''
+        }`}
+      >
+        {count}
+      </span>
+      <span className="font-mono text-xs uppercase tracking-widest">{label}</span>
     </span>
   )
 }
@@ -337,64 +393,98 @@ function StatPill({
 interface OrdenCardProps {
   orden: Orden
   now: number
-  colorClasses: { header: string; badge: string; btn: string; btnPrep: string }
   isFadingOut: boolean
   onIniciarPreparacion: (id: string) => void
   onMarcarLista: (id: string) => void
 }
 
-function OrdenCard({ orden, now, colorClasses, isFadingOut, onIniciarPreparacion, onMarcarLista }: OrdenCardProps) {
+function OrdenCard({ orden, now, isFadingOut, onIniciarPreparacion, onMarcarLista }: OrdenCardProps) {
   const elapsed = now - new Date(orden.created_at).getTime()
   const timerColor = elapsedColor(elapsed)
+  const mins = elapsedMinutes(elapsed)
 
-  const stateConfig: Record<EstadoKDS, { label: string; badgeClass: string }> = {
-    nueva: { label: 'Nueva', badgeClass: 'bg-orange-500 text-white animate-pulse' },
-    en_preparacion: { label: 'Preparando', badgeClass: 'bg-yellow-500 text-gray-900' },
-    lista: { label: 'Lista ✓', badgeClass: 'bg-green-500 text-white' },
+  const accentByState: Record<EstadoKDS, string> = {
+    nueva: 'bg-sa-strawberry animate-pulse',
+    en_preparacion: 'bg-sa-banana',
+    lista: 'bg-sa-mint',
   }
 
-  const { label: stateLabel, badgeClass } = stateConfig[orden.estado]
+  const stateLabel: Record<EstadoKDS, string> = {
+    nueva: 'Nueva',
+    en_preparacion: 'Preparando',
+    lista: 'Lista',
+  }
+
+  const stateBadge: Record<EstadoKDS, string> = {
+    nueva: 'bg-sa-strawberry text-white',
+    en_preparacion: 'bg-sa-banana text-sa-coffee',
+    lista: 'bg-sa-mint text-sa-green-ink',
+  }
 
   return (
     <div
-      className={`bg-gray-800 rounded-2xl overflow-hidden border border-gray-700 flex flex-col transition-all duration-700 ${
+      className={`bg-sa-cream rounded-sa-lg shadow-sa overflow-hidden flex flex-col transition-all duration-700 ${
         isFadingOut ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
-      }`}
+      } ${orden.estado === 'lista' ? 'bg-sa-mint/20' : ''}`}
     >
-      {/* Card header */}
-      <div className="flex items-center justify-between px-4 py-3 bg-gray-750 border-b border-gray-700">
-        <div className="flex items-center gap-2">
-          <span className="text-white font-extrabold text-xl">
+      {/* Accent strip */}
+      <div className={`h-1.5 w-full ${accentByState[orden.estado]}`} />
+
+      {/* Card header: folio + channel */}
+      <div className="flex items-start justify-between px-5 pt-4">
+        <div className="flex flex-col">
+          <span className="font-mono text-[10px] uppercase tracking-widest text-sa-green-ink/50">
+            Folio
+          </span>
+          <span className="font-display text-sa-green-ink text-3xl leading-none mt-0.5">
             #ORD-{String(orden.folio).padStart(3, '0')}
           </span>
-          <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${CANAL_CLASSES[orden.canal]}`}>
-            {CANAL_LABELS[orden.canal]}
-          </span>
         </div>
-        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badgeClass}`}>
-          {stateLabel}
+        <span
+          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-sa font-mono text-[11px] uppercase tracking-wider ${CANAL_CLASSES[orden.canal]}`}
+        >
+          <span className="text-sm">{CANAL_EMOJI[orden.canal]}</span>
+          {CANAL_LABELS[orden.canal]}
         </span>
       </div>
 
-      {/* Timer */}
-      <div className={`flex items-center gap-1 px-4 pt-3 pb-1 ${timerColor} font-mono font-bold text-lg`}>
-        <span>⏱</span>
-        <span>{formatElapsed(elapsed)}</span>
+      {/* Timer + state */}
+      <div className="px-5 pt-3 pb-2 flex items-end justify-between">
+        <div className="flex items-baseline gap-2">
+          <span className={`font-display text-4xl leading-none ${timerColor}`}>
+            {formatElapsed(elapsed)}
+          </span>
+          <span className="font-mono text-xs uppercase tracking-widest text-sa-green-ink/50">
+            {mins < 1 ? 'recién' : 'min'}
+          </span>
+        </div>
+        <span
+          className={`inline-flex items-center px-2.5 py-1 rounded-sa font-mono text-[10px] uppercase tracking-widest ${stateBadge[orden.estado]}`}
+        >
+          {stateLabel[orden.estado]}
+        </span>
       </div>
 
+      <div className="mx-5 my-1 h-px bg-sa-green-ink/10" />
+
       {/* Items */}
-      <div className="px-4 py-2 space-y-2 flex-1">
+      <div className="px-3 py-2 flex-1">
         {orden.orden_items.map((item) => (
-          <div key={item.id} className="flex gap-3">
-            <span
-              className={`${colorClasses.badge} text-white text-sm font-bold px-2 py-0.5 rounded-lg min-w-[2.5rem] text-center shrink-0`}
-            >
+          <div
+            key={item.id}
+            className="flex gap-3 items-start px-2 py-2 rounded-sa hover:bg-sa-cream-soft transition-colors"
+          >
+            <span className="font-mono font-medium text-sm bg-sa-green-ink text-sa-cream px-2.5 py-1 rounded-sa min-w-[2.75rem] text-center shrink-0 tabular-nums">
               {item.cantidad}×
             </span>
-            <div>
-              <p className="text-white font-medium leading-tight">{item.productos?.nombre ?? '—'}</p>
+            <div className="min-w-0 flex-1">
+              <p className="font-body font-medium text-sa-green-ink leading-tight">
+                {item.productos?.nombre ?? '—'}
+              </p>
               {item.personalizacion && (
-                <p className="text-gray-400 text-xs mt-0.5 italic">{item.personalizacion}</p>
+                <p className="font-mono text-[11px] mt-1 text-sa-strawberry uppercase tracking-wide">
+                  ↳ {item.personalizacion}
+                </p>
               )}
             </div>
           </div>
@@ -402,26 +492,26 @@ function OrdenCard({ orden, now, colorClasses, isFadingOut, onIniciarPreparacion
       </div>
 
       {/* Action button */}
-      <div className="px-4 pb-4 pt-2">
+      <div className="px-5 pb-5 pt-2">
         {orden.estado === 'nueva' && (
           <button
             onClick={() => onIniciarPreparacion(orden.id)}
-            className={`w-full ${colorClasses.btnPrep} text-white py-3 rounded-xl font-semibold transition-colors`}
+            className="w-full bg-sa-green hover:bg-sa-green-deep text-sa-cream font-display text-xl tracking-wide py-3 rounded-sa transition-colors shadow-sa-sm"
           >
-            Preparando
+            ▶ Preparar
           </button>
         )}
         {orden.estado === 'en_preparacion' && (
           <button
             onClick={() => onMarcarLista(orden.id)}
-            className={`w-full ${colorClasses.btn} text-white py-3 rounded-xl font-semibold transition-colors`}
+            className="w-full bg-sa-mint hover:bg-sa-mint/80 text-sa-green-ink font-display text-xl tracking-wide py-3 rounded-sa transition-colors shadow-sa-sm"
           >
-            Lista ✓
+            ✓ Lista
           </button>
         )}
         {orden.estado === 'lista' && (
-          <div className="w-full bg-green-800/40 text-green-300 py-3 rounded-xl font-semibold text-center text-sm">
-            Completada ✓
+          <div className="w-full bg-sa-mint/40 text-sa-green-ink font-display text-lg py-3 rounded-sa text-center">
+            ✓ Completada
           </div>
         )}
       </div>

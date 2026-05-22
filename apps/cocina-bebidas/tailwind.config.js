@@ -3,6 +3,10 @@ import brandPreset from '@pos/brand/tailwind-preset'
 /** @type {import('tailwindcss').Config} */
 export default {
   presets: [brandPreset],
-  content: ['./index.html', './src/**/*.{ts,tsx}'],
+  content: [
+    './index.html',
+    './src/**/*.{ts,tsx}',
+    '../cocina-alimentos/src/**/*.{ts,tsx}',
+  ],
   plugins: [],
 }

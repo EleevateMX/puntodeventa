@@ -290,46 +290,70 @@ export function Dashboard() {
           </div>
 
           {/* B — Órdenes en vivo */}
-          <div className="bg-white rounded-sa p-6 shadow-sa-sm border border-sa-green-ink/5">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <h3 className="text-xl font-display text-sa-green-ink">Órdenes en vivo</h3>
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sa-mint opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-sa-mint"></span>
-                </span>
-              </div>
-              <span className="text-xs font-mono text-sa-green-ink/60">{ORDENES_DEMO.length} órdenes</span>
-            </div>
-            <div className="space-y-2">
-              {ORDENES_DEMO.map((o) => {
-                const style = estadoStyles[o.estado]
-                return (
-                  <div
-                    key={o.id}
-                    className="flex items-center justify-between px-4 py-3 rounded-sa bg-sa-cream-soft/60 border border-sa-green-ink/5 hover:bg-sa-cream-soft transition-colors"
-                  >
-                    <div className="flex items-center gap-3">
-                      <span
-                        className={`text-xs font-mono uppercase tracking-wider px-2.5 py-1 rounded-full ${style.bg} ${style.text}`}
-                      >
-                        {style.label}
-                      </span>
-                      <span className="font-mono text-sm font-semibold text-sa-green-ink">
-                        {o.folio}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <span className="text-xs font-mono text-sa-green-ink/60">{o.minutos} min</span>
-                      <span className="text-sm font-mono font-semibold text-sa-green-ink">
-                        {formatCurrency(o.total)}
-                      </span>
-                    </div>
+          {(() => {
+            const ordenesParaPanel: OrdenLive[] =
+              ordenesVivo.length > 0
+                ? ordenesVivo.map((o) => {
+                    const mapEstado = (e: string): EstadoOrden => {
+                      if (e === 'lista') return 'lista'
+                      if (e === 'en_preparacion') return 'preparando'
+                      if (e === 'pendiente') return 'preparando'
+                      return 'nueva'
+                    }
+                    return {
+                      id: o.id,
+                      folio: `#A-${o.folio}`,
+                      total: o.total,
+                      estado: mapEstado(o.estado),
+                      minutos: Math.floor(
+                        (Date.now() - new Date(o.created_at).getTime()) / 60000,
+                      ),
+                    }
+                  })
+                : ORDENES_DEMO
+            return (
+              <div className="bg-white rounded-sa p-6 shadow-sa-sm border border-sa-green-ink/5">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-xl font-display text-sa-green-ink">Órdenes en vivo</h3>
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sa-mint opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-sa-mint"></span>
+                    </span>
                   </div>
-                )
-              })}
-            </div>
-          </div>
+                  <span className="text-xs font-mono text-sa-green-ink/60">{ordenesParaPanel.length} órdenes</span>
+                </div>
+                <div className="space-y-2">
+                  {ordenesParaPanel.map((o) => {
+                    const style = estadoStyles[o.estado]
+                    return (
+                      <div
+                        key={o.id}
+                        className="flex items-center justify-between px-4 py-3 rounded-sa bg-sa-cream-soft/60 border border-sa-green-ink/5 hover:bg-sa-cream-soft transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span
+                            className={`text-xs font-mono uppercase tracking-wider px-2.5 py-1 rounded-full ${style.bg} ${style.text}`}
+                          >
+                            {style.label}
+                          </span>
+                          <span className="font-mono text-sm font-semibold text-sa-green-ink">
+                            {o.folio}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <span className="text-xs font-mono text-sa-green-ink/60">{o.minutos} min</span>
+                          <span className="text-sm font-mono font-semibold text-sa-green-ink">
+                            {formatCurrency(o.total)}
+                          </span>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )
+          })()}
         </div>
 
         {/* Right column */}

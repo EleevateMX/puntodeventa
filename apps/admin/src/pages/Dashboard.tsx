@@ -392,7 +392,7 @@ export function Dashboard() {
                 {alertasStock.length > 0 && (
                   <div className="flex items-center justify-between px-3 py-2.5 rounded-sa bg-sa-banana/20 border border-sa-banana/40">
                     <div className="flex items-center gap-2 min-w-0">
-                      <span className="text-lg">⚠️</span>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-sa-coffee shrink-0"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                       <span className="text-xs text-sa-coffee truncate">
                         <span className="font-bold">{alertasStock.length}</span> insumos
                         con stock bajo

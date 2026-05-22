@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react'
+import React, { useRef, useEffect, useState, type JSX } from 'react'
 import { useReportes, type Periodo } from '../hooks/useReportes'
 
 // --- Helpers ---
@@ -35,11 +35,11 @@ const METODO_LABEL: Record<string, string> = {
   qr: 'QR / Transfer.',
 }
 
-const METODO_ICON: Record<string, string> = {
-  efectivo: '💵',
-  tarjeta_debito: '💳',
-  tarjeta_credito: '🏦',
-  qr: '📱',
+const METODO_ICON: Record<string, JSX.Element> = {
+  efectivo:       (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/><path d="M17 12h.01"/><path d="M7 12h.01"/></svg>),
+  tarjeta_debito: (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>),
+  tarjeta_credito:(<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>),
+  qr:             (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>),
 }
 
 // --- SVG Bar Chart ---
@@ -263,25 +263,25 @@ export function Ventas() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <div className="bg-white rounded-sa p-5 shadow-sa-sm border border-sa-green-ink/5">
             <div className="flex items-center gap-2 text-sa-green-ink/60 font-mono text-xs uppercase tracking-wide mb-2">
-              <span>💰</span> Ventas totales
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Ventas totales
             </div>
             <p className="text-3xl font-display text-sa-green-ink leading-none">{formatMoney(totalPeriodo)}</p>
           </div>
           <div className="bg-white rounded-sa p-5 shadow-sa-sm border border-sa-green-ink/5">
             <div className="flex items-center gap-2 text-sa-green-ink/60 font-mono text-xs uppercase tracking-wide mb-2">
-              <span>🧾</span> Órdenes
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> Órdenes
             </div>
             <p className="text-3xl font-display text-sa-green-ink leading-none">{totalOrdenes.toLocaleString('es-MX')}</p>
           </div>
           <div className="bg-white rounded-sa p-5 shadow-sa-sm border border-sa-green-ink/5">
             <div className="flex items-center gap-2 text-sa-green-ink/60 font-mono text-xs uppercase tracking-wide mb-2">
-              <span>🎯</span> Ticket promedio
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> Ticket promedio
             </div>
             <p className="text-3xl font-display text-sa-green-ink leading-none">{formatMoney(ticketPromedio)}</p>
           </div>
           <div className="bg-white rounded-sa p-5 shadow-sa-sm border border-sa-green-ink/5">
             <div className="flex items-center gap-2 text-sa-green-ink/60 font-mono text-xs uppercase tracking-wide mb-2">
-              <span>📅</span> Mejor día
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Mejor día
             </div>
             <p className="text-base font-display text-sa-green-ink leading-tight">{diaMejorLabel}</p>
           </div>
@@ -333,7 +333,7 @@ export function Ventas() {
                 return (
                   <div key={m.metodo}>
                     <div className="flex items-center gap-2 mb-1">
-                      <span>{METODO_ICON[m.metodo] ?? '💳'}</span>
+                      {METODO_ICON[m.metodo] ?? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>}
                       <span className="flex-1 text-sm font-medium text-sa-green-ink/80">
                         {METODO_LABEL[m.metodo] ?? m.metodo}
                       </span>

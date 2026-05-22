@@ -5,9 +5,30 @@ import { ModalCategoria } from '../components/menu/ModalCategoria'
 
 type Tab = 'productos' | 'categorias'
 
-const COCINA_ICON: Record<string, string> = {
-  alimentos: '🍽️',
-  bebidas: '🥤',
+const IconFork = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/>
+  </svg>
+)
+const IconCup = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" x2="6" y1="2" y2="4"/><line x1="10" x2="10" y1="2" y2="4"/><line x1="14" x2="14" y1="2" y2="4"/>
+  </svg>
+)
+const IconGrid = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+  </svg>
+)
+const IconSearch = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+  </svg>
+)
+
+const COCINA_ICON: Record<string, JSX.Element> = {
+  alimentos: <IconFork />,
+  bebidas: <IconCup />,
 }
 
 const COCINA_COLOR: Record<string, string> = {
@@ -136,7 +157,10 @@ export function Menu() {
                   : 'text-sa-green-ink/60 hover:text-sa-green-ink'
               }`}
             >
-              {t === 'productos' ? `🍽️ Productos (${productos.length})` : `🗂️ Categorías (${categorias.length})`}
+              {t === 'productos'
+                ? <><IconFork /> Productos ({productos.length})</>
+                : <><IconGrid /> Categorías ({categorias.length})</>
+              }
             </button>
           ))}
         </div>
@@ -164,7 +188,7 @@ export function Menu() {
                   : 'bg-white text-sa-green-ink/70 border border-sa-green-ink/15 hover:border-sa-green-ink/30'
               }`}
             >
-              {COCINA_ICON[c.slug] ?? '🍴'} {c.nombre}
+              {COCINA_ICON[c.slug] ?? <IconFork />} {c.nombre}
             </button>
           ))}
         </div>
@@ -172,7 +196,7 @@ export function Menu() {
         {/* Search — solo en productos */}
         {tab === 'productos' && (
           <div className="relative ml-auto">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sa-green-ink/50 text-sm">🔍</span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sa-green-ink/50"><IconSearch /></span>
             <input
               type="text"
               value={busqueda}
@@ -203,7 +227,7 @@ export function Menu() {
         ) : tab === 'productos' ? (
           productosFiltrados.length === 0 ? (
             <EmptyState
-              icon="🍽️"
+              icon={<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg>}
               mensaje={busqueda ? 'Sin resultados para tu búsqueda' : 'No hay productos aún'}
               accion={!busqueda ? 'Crea el primer producto' : undefined}
               onAccion={!busqueda ? abrirNuevoProducto : undefined}
@@ -218,7 +242,7 @@ export function Menu() {
           )
         ) : categoriasFiltradas.length === 0 ? (
           <EmptyState
-            icon="🗂️"
+            icon={<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>}
             mensaje="No hay categorías aún"
             accion="Crea la primera categoría"
             onAccion={abrirNuevaCategoria}
@@ -296,14 +320,14 @@ function EmptyState({
   accion,
   onAccion,
 }: {
-  icon: string
+  icon: React.ReactNode
   mensaje: string
   accion?: string
   onAccion?: () => void
 }) {
   return (
     <div className="flex flex-col items-center justify-center py-20 text-sa-green-ink/50 gap-4">
-      <span className="text-6xl">{icon}</span>
+      <span className="opacity-30">{icon}</span>
       <p className="text-lg font-medium">{mensaje}</p>
       {accion && onAccion && (
         <button
@@ -356,7 +380,7 @@ function TablaProductos({
                       />
                     ) : (
                       <div className="w-10 h-10 rounded-lg bg-sa-cream-warm flex items-center justify-center text-lg flex-shrink-0">
-                        {COCINA_ICON[slug] ?? '🍴'}
+                        {COCINA_ICON[slug] ?? <IconFork />}
                       </div>
                     )}
                     <div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, type JSX } from 'react'
 import { useEmpleados, type Empleado, type Rol } from '../hooks/useEmpleados'
 import { TablaEmpleados } from '../components/empleados/TablaEmpleados'
 import { ModalEmpleado } from '../components/empleados/ModalEmpleado'
@@ -44,12 +44,12 @@ const ROL_LABEL: Record<Rol, string> = {
   supervisor: 'Supervisor',
 }
 
-const ROL_EMOJI: Record<Rol, string> = {
-  admin:      '👑',
-  cajero:     '💳',
-  cocinero:   '🍳',
-  mesero:     '🛎',
-  supervisor: '🔑',
+const ROL_ICON: Record<Rol, JSX.Element> = {
+  admin:      (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z"/></svg>),
+  cajero:     (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>),
+  cocinero:   (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6z"/><line x1="6" y1="17" x2="18" y2="17"/></svg>),
+  mesero:     (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8c0-4-3-6-6-6S6 4 6 8"/><path d="M2 9h20"/><path d="M12 9v7"/><path d="M8 21h8"/><path d="M9 17v4"/><path d="M15 17v4"/></svg>),
+  supervisor: (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>),
 }
 
 const ROL_DOT: Record<Rol, string> = {
@@ -151,7 +151,7 @@ export function Roles() {
           <div className="bg-white rounded-sa border border-sa-green-ink/5 shadow-sa-sm p-4">
             <p className="text-xs font-mono text-sa-green-ink/60 uppercase tracking-wide">Rol más común</p>
             <div className="flex items-center gap-2 mt-2">
-              <span className="text-2xl">{ROL_EMOJI[rolMasComun]}</span>
+              <span className="text-2xl">{ROL_ICON[rolMasComun]}</span>
               <span className={`px-2.5 py-1 rounded-full text-sm font-semibold ${ROL_COLOR[rolMasComun]}`}>
                 {ROL_LABEL[rolMasComun]}
               </span>
@@ -194,7 +194,7 @@ export function Roles() {
                   {ROLES_TABLA.map((rol) => (
                     <th key={rol} className="px-5 py-3 font-medium text-center">
                       <div className="flex flex-col items-center gap-1">
-                        <span className="text-base">{ROL_EMOJI[rol]}</span>
+                        <span className="text-base">{ROL_ICON[rol]}</span>
                         <span>{ROL_LABEL[rol]}</span>
                       </div>
                     </th>

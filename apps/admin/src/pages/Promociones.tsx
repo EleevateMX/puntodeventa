@@ -182,7 +182,7 @@ export function Promociones() {
             onClick={() => setConfirmBorrar(null)}
           />
           <div className="relative bg-sa-cream-soft rounded-sa-lg shadow-sa border border-sa-green-ink/8 p-8 max-w-sm w-full text-center">
-            <p className="text-4xl mb-4">🗑️</p>
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-sa-green-ink/30 mx-auto mb-4"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
             <h3 className="font-display text-2xl text-sa-green-deep mb-2">
               ¿Borrar promo?
             </h3>

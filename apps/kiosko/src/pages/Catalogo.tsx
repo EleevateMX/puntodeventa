@@ -59,10 +59,18 @@ export function Catalogo() {
     }
     Promise.all([getProductosConCategorias(), getCategorias()])
       .then(([prods, cats]) => {
-        setProductos(prods as Producto[])
-        setCategorias(cats as Categoria[])
+        if (prods.length === 0) {
+          setProductos(DEMO_PRODUCTOS)
+          setCategorias(DEMO_CATEGORIAS)
+        } else {
+          setProductos(prods as Producto[])
+          setCategorias(cats as Categoria[])
+        }
       })
-      .catch(console.error)
+      .catch(() => {
+        setProductos(DEMO_PRODUCTOS)
+        setCategorias(DEMO_CATEGORIAS)
+      })
       .finally(() => setLoading(false))
   }, [])
 

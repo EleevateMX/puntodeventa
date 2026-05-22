@@ -44,6 +44,32 @@ const isSupabaseConfigured =
   import.meta.env.VITE_SUPABASE_URL &&
   !String(import.meta.env.VITE_SUPABASE_URL).includes('xxxx')
 
+const usarDemo = () =>
+  !isSupabaseConfigured || localStorage.getItem('shake-demo-mode') === 'true'
+
+const DEMO_COCINAS = [
+  { id: 'coc-1', nombre: 'Bebidas', slug: 'bebidas', activa: true, created_at: '' },
+  { id: 'coc-2', nombre: 'Alimentos', slug: 'alimentos', activa: true, created_at: '' },
+] as unknown as Cocina[]
+
+const DEMO_CATS = [
+  { id: 'cat-1', nombre: 'Shakes',  cocina_id: 'coc-1', activa: true, created_at: '', cocinas: DEMO_COCINAS[0] },
+  { id: 'cat-2', nombre: 'Bowls',   cocina_id: 'coc-2', activa: true, created_at: '', cocinas: DEMO_COCINAS[1] },
+  { id: 'cat-3', nombre: 'Snacks',  cocina_id: 'coc-2', activa: true, created_at: '', cocinas: DEMO_COCINAS[1] },
+  { id: 'cat-4', nombre: 'Cafés',   cocina_id: 'coc-1', activa: true, created_at: '', cocinas: DEMO_COCINAS[0] },
+] as unknown as CategoriaConCocina[]
+
+const DEMO_PRODS = [
+  { id: 'p1', nombre: 'Shake de Fresa',      descripcion: 'Fresas frescas, leche de almendra', precio: 89,  imagen_url: null, categoria_id: 'cat-1', activo: true, created_at: '', cocina_id: null, categorias: DEMO_CATS[0] },
+  { id: 'p2', nombre: 'Shake de Mango',      descripcion: 'Mango mexicano, coco y leche',       precio: 89,  imagen_url: null, categoria_id: 'cat-1', activo: true, created_at: '', cocina_id: null, categorias: DEMO_CATS[0] },
+  { id: 'p3', nombre: 'Shake Verde',         descripcion: 'Espinaca, pepino, piña y jengibre',  precio: 95,  imagen_url: null, categoria_id: 'cat-1', activo: true, created_at: '', cocina_id: null, categorias: DEMO_CATS[0] },
+  { id: 'p4', nombre: 'Power Bowl',          descripcion: 'Pollo, arroz integral, aguacate',    precio: 149, imagen_url: null, categoria_id: 'cat-2', activo: true, created_at: '', cocina_id: null, categorias: DEMO_CATS[1] },
+  { id: 'p5', nombre: 'Açaí Bowl',           descripcion: 'Base de açaí, granola, frutos rojos',precio: 139, imagen_url: null, categoria_id: 'cat-2', activo: true, created_at: '', cocina_id: null, categorias: DEMO_CATS[1] },
+  { id: 'p6', nombre: 'Energy Bites',        descripcion: 'Avena, mantequilla de maní · 6 pzas',precio: 75,  imagen_url: null, categoria_id: 'cat-3', activo: true, created_at: '', cocina_id: null, categorias: DEMO_CATS[2] },
+  { id: 'p7', nombre: 'Café Americano',      descripcion: 'Espresso doble con agua caliente',   precio: 55,  imagen_url: null, categoria_id: 'cat-4', activo: true, created_at: '', cocina_id: null, categorias: DEMO_CATS[3] },
+  { id: 'p8', nombre: 'Cold Brew',           descripcion: 'Café en frío 12h, sin acidez',        precio: 69,  imagen_url: null, categoria_id: 'cat-4', activo: true, created_at: '', cocina_id: null, categorias: DEMO_CATS[3] },
+] as unknown as ProductoConCategoria[]
+
 export function useMenu() {
   const [productos, setProductos] = useState<ProductoConCategoria[]>([])
   const [categorias, setCategorias] = useState<CategoriaConCocina[]>([])
@@ -52,7 +78,12 @@ export function useMenu() {
   const [error, setError] = useState<string | null>(null)
 
   const cargar = useCallback(async () => {
-    if (!isSupabaseConfigured) return
+    if (usarDemo()) {
+      setProductos(DEMO_PRODS)
+      setCategorias(DEMO_CATS)
+      setCocinas(DEMO_COCINAS)
+      return
+    }
     setLoading(true)
     setError(null)
     try {

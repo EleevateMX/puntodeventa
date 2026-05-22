@@ -1,4 +1,14 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, type JSX } from 'react'
+
+const IcoWallet = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>)
+const IcoTrash2 = () => (<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-sa-green-ink/30 mx-auto mb-4"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>)
+
+const NIVEL_ICON: Record<string, JSX.Element> = {
+  bronce: (<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#CD7F32" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>),
+  plata:  (<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#9EA8B3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>),
+  oro:    (<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C9A227" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>),
+  platino:(<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6C4A9E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>),
+}
 import {
   useLealtad,
   evaluarNivel,
@@ -423,7 +433,7 @@ function TabClientes({ clientes, onAgregar, onCargar, onBorrar }: TabClientesPro
                     <td className="px-4 py-3">
                       {c.wallet_saldo > 0 ? (
                         <span className="inline-flex items-center gap-1 font-medium text-sa-green-deep">
-                          💰 {formatMXN(c.wallet_saldo)}
+                          <IcoWallet /> {formatMXN(c.wallet_saldo)}
                         </span>
                       ) : (
                         <span className="text-sa-green-ink/30 text-xs">—</span>
@@ -492,7 +502,7 @@ function TabClientes({ clientes, onAgregar, onCargar, onBorrar }: TabClientesPro
             onClick={() => setConfirmBorrar(null)}
           />
           <div className="relative bg-white rounded-sa-lg shadow-sa border border-sa-green-ink/8 p-8 max-w-sm w-full text-center">
-            <p className="text-4xl mb-4">🗑️</p>
+            <IcoTrash2 />
             <h3 className="font-display text-2xl text-sa-green-deep mb-2">¿Borrar cliente?</h3>
             <p className="text-sm text-sa-green-ink/60 mb-6">Esta acción no se puede deshacer.</p>
             <div className="flex gap-3">
@@ -754,7 +764,7 @@ function TabConfiguracion() {
             className={`${n.color} rounded-sa-lg border border-sa-green-ink/8 p-5`}
           >
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-2xl">{n.emoji}</span>
+              {NIVEL_ICON[n.nivel] ?? null}
               <span className="font-display text-xl text-sa-green-deep capitalize">
                 {n.nivel}
               </span>

@@ -1,22 +1,46 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { usePosStore } from '@/store/posStore'
+import { getEmpleados, buscarEmpleadoPorPin, isSupabaseConfigured } from '@pos/supabase'
 
-// Demo employees for development (no Supabase needed)
-const DEMO_EMPLEADOS = [
-  { id: 'emp-001', nombre: 'Ana García', rol: 'cajero', pin: '1234' },
-  { id: 'emp-002', nombre: 'Carlos López', rol: 'cajero', pin: '5678' },
-  { id: 'emp-003', nombre: 'Supervisor', rol: 'supervisor', pin: '0000' },
+type EmpleadoUI = { id: string; nombre: string; rol: string }
+
+const DEMO_EMPLEADOS: EmpleadoUI[] = [
+  { id: 'emp-001', nombre: 'Ana García', rol: 'cajero' },
+  { id: 'emp-002', nombre: 'Carlos López', rol: 'cajero' },
+  { id: 'emp-003', nombre: 'Supervisor', rol: 'supervisor' },
 ]
+
+const DEMO_PINS: Record<string, string> = {
+  'emp-001': '1234',
+  'emp-002': '5678',
+  'emp-003': '0000',
+}
 
 export function Login() {
   const navigate = useNavigate()
   const iniciarSesion = usePosStore((s) => s.iniciarSesion)
-  const [empleadoSeleccionado, setEmpleadoSeleccionado] = useState<typeof DEMO_EMPLEADOS[0] | null>(null)
+  const sucursalId = usePosStore((s) => s.sucursalId)
+  const [empleados, setEmpleados] = useState<EmpleadoUI[]>([])
+  const [cargando, setCargando] = useState(true)
+  const [empleadoSeleccionado, setEmpleadoSeleccionado] = useState<EmpleadoUI | null>(null)
   const [pin, setPin] = useState('')
   const [error, setError] = useState('')
+  const [validando, setValidando] = useState(false)
 
-  function seleccionarEmpleado(emp: typeof DEMO_EMPLEADOS[0]) {
+  useEffect(() => {
+    if (!isSupabaseConfigured) {
+      setEmpleados(DEMO_EMPLEADOS)
+      setCargando(false)
+      return
+    }
+    getEmpleados()
+      .then((rows) => setEmpleados(rows.map((r) => ({ id: r.id, nombre: r.nombre, rol: r.rol }))))
+      .catch(() => setEmpleados(DEMO_EMPLEADOS))
+      .finally(() => setCargando(false))
+  }, [])
+
+  function seleccionarEmpleado(emp: EmpleadoUI) {
     setEmpleadoSeleccionado(emp)
     setPin('')
     setError('')
@@ -33,17 +57,33 @@ export function Login() {
     setError('')
   }
 
-  function validarPin() {
-    if (!empleadoSeleccionado) return
-    if (pin === empleadoSeleccionado.pin) {
-      iniciarSesion(
-        { id: empleadoSeleccionado.id, nombre: empleadoSeleccionado.nombre, rol: empleadoSeleccionado.rol },
-        `turno-${Date.now()}`,
-      )
-      navigate('/')
-    } else {
-      setError('Ese PIN no agita, intenta de nuevo')
-      setPin('')
+  async function validarPin() {
+    if (!empleadoSeleccionado || pin.length < 4 || validando) return
+    setValidando(true)
+    try {
+      if (isSupabaseConfigured) {
+        const emp = await buscarEmpleadoPorPin(pin, sucursalId)
+        if (emp && emp.id === empleadoSeleccionado.id) {
+          iniciarSesion({ id: emp.id, nombre: emp.nombre, rol: emp.rol }, `turno-${Date.now()}`)
+          navigate('/')
+        } else {
+          setError('Ese PIN no agita, intenta de nuevo')
+          setPin('')
+        }
+      } else {
+        if (pin === DEMO_PINS[empleadoSeleccionado.id]) {
+          iniciarSesion(
+            { id: empleadoSeleccionado.id, nombre: empleadoSeleccionado.nombre, rol: empleadoSeleccionado.rol },
+            `turno-${Date.now()}`,
+          )
+          navigate('/')
+        } else {
+          setError('Ese PIN no agita, intenta de nuevo')
+          setPin('')
+        }
+      }
+    } finally {
+      setValidando(false)
     }
   }
 
@@ -67,32 +107,40 @@ export function Login() {
         </div>
 
         {/* Employee selector */}
-        <div className="grid grid-cols-3 gap-3 mb-6">
-          {DEMO_EMPLEADOS.map((emp) => {
-            const activo = empleadoSeleccionado?.id === emp.id
-            return (
-              <button
-                key={emp.id}
-                onClick={() => seleccionarEmpleado(emp)}
-                className={`py-5 px-3 rounded-sa transition-all text-center border ${
-                  activo
-                    ? 'bg-sa-cream border-sa-green shadow-sa-sm'
-                    : 'bg-sa-cream-warm border-transparent hover:bg-sa-cream'
-                }`}
-              >
-                <div className="w-14 h-14 rounded-full bg-sa-green flex items-center justify-center text-sa-cream font-display text-2xl mx-auto mb-2">
-                  {emp.nombre[0]}
-                </div>
-                <p className={`font-display text-base leading-tight ${activo ? 'text-sa-green' : 'text-sa-green-ink'}`}>
-                  {emp.nombre.split(' ')[0]}
-                </p>
-                <p className="font-mono text-[10px] uppercase tracking-wide text-sa-green-ink/50 mt-1">
-                  {emp.rol}
-                </p>
-              </button>
-            )
-          })}
-        </div>
+        {cargando ? (
+          <div className="grid grid-cols-3 gap-3 mb-6">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="py-5 px-3 rounded-sa bg-sa-cream-warm animate-pulse h-28" />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-3 gap-3 mb-6">
+            {empleados.map((emp) => {
+              const activo = empleadoSeleccionado?.id === emp.id
+              return (
+                <button
+                  key={emp.id}
+                  onClick={() => seleccionarEmpleado(emp)}
+                  className={`py-5 px-3 rounded-sa transition-all text-center border ${
+                    activo
+                      ? 'bg-sa-cream border-sa-green shadow-sa-sm'
+                      : 'bg-sa-cream-warm border-transparent hover:bg-sa-cream'
+                  }`}
+                >
+                  <div className="w-14 h-14 rounded-full bg-sa-green flex items-center justify-center text-sa-cream font-display text-2xl mx-auto mb-2">
+                    {emp.nombre[0]}
+                  </div>
+                  <p className={`font-display text-base leading-tight ${activo ? 'text-sa-green' : 'text-sa-green-ink'}`}>
+                    {emp.nombre.split(' ')[0]}
+                  </p>
+                  <p className="font-mono text-[10px] uppercase tracking-wide text-sa-green-ink/50 mt-1">
+                    {emp.rol}
+                  </p>
+                </button>
+              )
+            })}
+          </div>
+        )}
 
         {/* PIN pad */}
         {empleadoSeleccionado && (
@@ -156,10 +204,10 @@ export function Login() {
 
             <button
               onClick={validarPin}
-              disabled={pin.length < 4}
+              disabled={pin.length < 4 || validando}
               className="w-full mt-5 bg-sa-green disabled:opacity-40 text-sa-cream py-4 rounded-sa-lg font-display text-xl hover:bg-sa-green-deep transition-colors"
             >
-              A agitar
+              {validando ? 'Verificando…' : 'A agitar'}
             </button>
           </div>
         )}

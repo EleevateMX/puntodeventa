@@ -12,6 +12,7 @@ interface PosStore {
   // Sesión
   empleadoActivo: { id: string; nombre: string; rol: string } | null
   turnoId: string | null
+  turnoInicio: string | null
   sucursalId: string
 
   // Orden activa
@@ -51,6 +52,7 @@ interface PosStore {
 export const usePosStore = create<PosStore>((set, get) => ({
   empleadoActivo: null,
   turnoId: null,
+  turnoInicio: null,
   sucursalId: '00000000-0000-0000-0000-000000000001',
   items: [],
   clienteActivo: null,
@@ -60,12 +62,13 @@ export const usePosStore = create<PosStore>((set, get) => ({
   promocionesAplicadas: [],
 
   iniciarSesion: (empleado, turnoId) =>
-    set({ empleadoActivo: empleado, turnoId }),
+    set({ empleadoActivo: empleado, turnoId, turnoInicio: new Date().toISOString() }),
 
   cerrarSesion: () =>
     set({
       empleadoActivo: null,
       turnoId: null,
+      turnoInicio: null,
       items: [],
       clienteActivo: null,
       descuento: null,

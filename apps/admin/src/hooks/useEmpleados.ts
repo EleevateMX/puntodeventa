@@ -1,5 +1,13 @@
 /// <reference types="vite/client" />
-import { useState } from 'react'
+import { useState, useCallback, useEffect } from 'react'
+import {
+  isSupabaseConfigured,
+  getEmpleados as getEmpleadosDB,
+  crearEmpleado as crearEmpleadoDB,
+  actualizarEmpleado as actualizarEmpleadoDB,
+  toggleActivoEmpleado as toggleActivoDB,
+} from '@pos/supabase'
+import type { EmpleadoInput as DBEmpleadoInput } from '@pos/supabase'
 
 export type Rol = 'admin' | 'cajero' | 'cocinero' | 'mesero' | 'supervisor'
 
@@ -20,10 +28,6 @@ export interface EmpleadoInput {
   sucursal_id: string | null
 }
 
-const isSupabaseConfigured =
-  import.meta.env.VITE_SUPABASE_URL &&
-  !String(import.meta.env.VITE_SUPABASE_URL).includes('xxxx')
-
 const DEMO_EMPLEADOS: Empleado[] = [
   { id: '1', nombre: 'Carlos Mendoza',   pin: '1234', rol: 'admin',      activo: true,  sucursal_id: null },
   { id: '2', nombre: 'Laura García',     pin: '5678', rol: 'cajero',     activo: true,  sucursal_id: null },
@@ -32,36 +36,97 @@ const DEMO_EMPLEADOS: Empleado[] = [
   { id: '5', nombre: 'Roberto Sánchez',  pin: '9012', rol: 'supervisor', activo: false, sucursal_id: null },
 ]
 
-function generarId(): string {
-  return Math.random().toString(36).slice(2, 10)
-}
-
 export function useEmpleados() {
-  const [empleados, setEmpleados] = useState<Empleado[]>(DEMO_EMPLEADOS)
+  const [empleados, setEmpleados] = useState<Empleado[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  function agregarEmpleado(input: EmpleadoInput): void {
-    const nuevo: Empleado = { ...input, id: generarId() }
-    setEmpleados((prev) => [...prev, nuevo])
+  const cargar = useCallback(async () => {
+    if (!isSupabaseConfigured) {
+      setEmpleados(DEMO_EMPLEADOS)
+      return
+    }
+    setLoading(true)
+    setError(null)
+    try {
+      const data = await getEmpleadosDB()
+      setEmpleados(data.map(row => ({
+        id: row.id,
+        nombre: row.nombre,
+        pin: row.pin ?? '',
+        rol: row.rol as Rol,
+        activo: row.activo,
+        sucursal_id: row.sucursal_id,
+      })))
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Error al cargar')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => { void cargar() }, [cargar])
+
+  async function agregarEmpleado(input: EmpleadoInput): Promise<void> {
+    if (!isSupabaseConfigured) {
+      const nuevo: Empleado = { ...input, id: Math.random().toString(36).slice(2, 10) }
+      setEmpleados((prev) => [...prev, nuevo])
+      return
+    }
+    await crearEmpleadoDB({
+      nombre: input.nombre,
+      pin: input.pin,
+      rol: input.rol as DBEmpleadoInput['rol'],
+      activo: input.activo,
+      sucursal_id: input.sucursal_id,
+    })
+    await cargar()
   }
 
-  function editarEmpleado(id: string, input: EmpleadoInput): void {
-    setEmpleados((prev) =>
-      prev.map((e) => (e.id === id ? { ...e, ...input } : e)),
-    )
+  async function editarEmpleado(id: string, input: EmpleadoInput): Promise<void> {
+    if (!isSupabaseConfigured) {
+      setEmpleados((prev) =>
+        prev.map((e) => (e.id === id ? { ...e, ...input } : e)),
+      )
+      return
+    }
+    await actualizarEmpleadoDB(id, {
+      nombre: input.nombre,
+      pin: input.pin,
+      rol: input.rol as DBEmpleadoInput['rol'],
+      activo: input.activo,
+      sucursal_id: input.sucursal_id,
+    })
+    await cargar()
   }
 
-  function borrarEmpleado(id: string): void {
+  async function borrarEmpleado(id: string): Promise<void> {
+    if (!isSupabaseConfigured) {
+      setEmpleados((prev) => prev.filter((e) => e.id !== id))
+      return
+    }
+    await toggleActivoDB(id, false)
     setEmpleados((prev) => prev.filter((e) => e.id !== id))
   }
 
-  function toggleActivoEmpleado(id: string): void {
-    setEmpleados((prev) =>
-      prev.map((e) => (e.id === id ? { ...e, activo: !e.activo } : e)),
-    )
+  async function toggleActivoEmpleado(id: string): Promise<void> {
+    if (!isSupabaseConfigured) {
+      setEmpleados((prev) =>
+        prev.map((e) => (e.id === id ? { ...e, activo: !e.activo } : e)),
+      )
+      return
+    }
+    const empleado = empleados.find((e) => e.id === id)
+    if (!empleado) return
+    await toggleActivoDB(id, !empleado.activo)
+    await cargar()
   }
 
   return {
     empleados,
+    loading,
+    error,
+    cargar,
     isSupabaseConfigured: Boolean(isSupabaseConfigured),
     agregarEmpleado,
     editarEmpleado,

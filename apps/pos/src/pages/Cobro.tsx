@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { usePosStore } from '@/store/posStore'
+import { crearOrden, isSupabaseConfigured } from '@pos/supabase'
 import type { MetodoPago, PagoItem } from '../types'
 
 const METODOS: { key: MetodoPago; label: string; icon: string }[] = [
@@ -21,7 +22,7 @@ const DEMO_GC = [
 
 export function Cobro() {
   const navigate = useNavigate()
-  const { total, clienteActivo, marcarPagado, items, montoDescuento, montoPromos, promocionesAplicadas } = usePosStore()
+  const { total, clienteActivo, marcarPagado, items, montoDescuento, montoPromos, promocionesAplicadas, notas, sucursalId, descuento } = usePosStore()
 
   const [modo, setModo] = useState<'simple' | 'mixto'>('simple')
   const [metodoPrincipal, setMetodoPrincipal] = useState<MetodoPago>('efectivo')
@@ -83,9 +84,43 @@ export function Cobro() {
 
   async function confirmarPago() {
     setProcesando(true)
-    // TODO: Insert orden + orden_items + orden_pagos to Supabase
-    await new Promise((r) => setTimeout(r, 800))
-    const folio = `A-${Date.now().toString(36).slice(-4).toUpperCase()}`
+
+    const metodoPagoFinal: MetodoPago = modo === 'simple'
+      ? metodoPrincipal
+      : (pagos[0]?.metodo ?? 'efectivo')
+
+    let folio = `A-${Date.now().toString(36).slice(-4).toUpperCase()}`
+
+    if (isSupabaseConfigured) {
+      try {
+        const orden = await crearOrden(
+          {
+            sucursal_id: sucursalId,
+            canal: 'pos',
+            metodo_pago: metodoPagoFinal,
+            total: totalOrden,
+            descuento: montoDescuento() + montoPromos(),
+            cliente_id: clienteActivo?.id ?? null,
+            notas: notas || null,
+            pagos_mixtos: modo === 'mixto' ? pagos.map((p) => ({ metodo: p.metodo, monto: p.monto })) : undefined,
+          },
+          items.map((i) => ({
+            producto_id: i.producto_id,
+            cantidad: i.cantidad,
+            precio_unitario: i.precio,
+            cocina_id: i.cocina_id,
+            personalizacion: i.personalizacion ?? null,
+          })),
+        )
+        folio = `A-${orden.folio}`
+      } catch (err) {
+        console.error('Error al guardar orden en Supabase:', err)
+        // fall through — folio already set from timestamp above
+      }
+    } else {
+      await new Promise((r) => setTimeout(r, 800))
+    }
+
     marcarPagado(folio)
     navigate('/')
     setProcesando(false)

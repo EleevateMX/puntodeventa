@@ -3,33 +3,13 @@ import { useNavigate } from 'react-router-dom'
 import { usePosStore } from '@/store/posStore'
 import { CatalogoBusqueda } from '@/components/pos/CatalogoBusqueda'
 import { OrdenPanel } from '@/components/pos/OrdenPanel'
-import type { Producto, Categoria } from '../types'
-
-// Demo data — replace with Supabase queries when connected
-const DEMO_CATEGORIAS: Categoria[] = [
-  { id: 'cat-1', nombre: 'Platillos', cocina_id: 'c1', cocinas: { id: 'c1', nombre: 'Alimentos', slug: 'alimentos' } },
-  { id: 'cat-2', nombre: 'Ensaladas', cocina_id: 'c1', cocinas: { id: 'c1', nombre: 'Alimentos', slug: 'alimentos' } },
-  { id: 'cat-3', nombre: 'Shakes', cocina_id: 'c2', cocinas: { id: 'c2', nombre: 'Bebidas', slug: 'bebidas' } },
-  { id: 'cat-4', nombre: 'Café', cocina_id: 'c2', cocinas: { id: 'c2', nombre: 'Bebidas', slug: 'bebidas' } },
-]
-
-const DEMO_PRODUCTOS: Producto[] = [
-  { id: 'p1', nombre: 'Pechuga a la plancha', descripcion: 'Con arroz y verduras', precio: 120, imagen_url: null, categoria_id: 'cat-1', activo: true, categorias: DEMO_CATEGORIAS[0]! },
-  { id: 'p2', nombre: 'Bistec encebollado', descripcion: 'Con papas y frijoles', precio: 130, imagen_url: null, categoria_id: 'cat-1', activo: true, categorias: DEMO_CATEGORIAS[0]! },
-  { id: 'p3', nombre: 'Quesadillas', descripcion: '3 piezas con salsa', precio: 75, imagen_url: null, categoria_id: 'cat-1', activo: true, categorias: DEMO_CATEGORIAS[0]! },
-  { id: 'p4', nombre: 'Ensalada César', descripcion: 'Lechuga romana y aderezo', precio: 85, imagen_url: null, categoria_id: 'cat-2', activo: true, categorias: DEMO_CATEGORIAS[1]! },
-  { id: 'p5', nombre: 'Ensalada mixta', descripcion: 'Vegetales frescos', precio: 70, imagen_url: null, categoria_id: 'cat-2', activo: true, categorias: DEMO_CATEGORIAS[1]! },
-  { id: 'p6', nombre: 'Shake de fresa', descripcion: 'Con leche y fresa natural', precio: 65, imagen_url: null, categoria_id: 'cat-3', activo: true, categorias: DEMO_CATEGORIAS[2]! },
-  { id: 'p7', nombre: 'Shake de mango', descripcion: 'Mango con leche', precio: 65, imagen_url: null, categoria_id: 'cat-3', activo: true, categorias: DEMO_CATEGORIAS[2]! },
-  { id: 'p8', nombre: 'Café americano', descripcion: 'Grano recién molido', precio: 35, imagen_url: null, categoria_id: 'cat-4', activo: true, categorias: DEMO_CATEGORIAS[3]! },
-  { id: 'p9', nombre: 'Café con leche', descripcion: 'Espresso y leche vaporizada', precio: 45, imagen_url: null, categoria_id: 'cat-4', activo: true, categorias: DEMO_CATEGORIAS[3]! },
-  { id: 'p10', nombre: 'Limonada natural', descripcion: 'Con menta y hielo', precio: 40, imagen_url: null, categoria_id: 'cat-4', activo: true, categorias: DEMO_CATEGORIAS[3]! },
-]
+import { useProductosPOS } from '@/hooks/useProductosPOS'
 
 export function Caja() {
   const navigate = useNavigate()
   const { empleadoActivo, cerrarSesion, limpiarOrden } = usePosStore()
   const [horaActual, setHoraActual] = useState(new Date())
+  const { productos, categorias, loading } = useProductosPOS()
 
   useEffect(() => {
     const interval = setInterval(() => setHoraActual(new Date()), 30000)
@@ -70,10 +50,16 @@ export function Caja() {
       <div className="flex-1 flex overflow-hidden gap-3 p-3">
         {/* Left: Catalog */}
         <div className="flex-1 flex flex-col overflow-hidden bg-sa-cream-soft rounded-sa shadow-sa-sm">
-          <CatalogoBusqueda
-            productos={DEMO_PRODUCTOS}
-            categorias={DEMO_CATEGORIAS}
-          />
+          {loading ? (
+            <div className="flex items-center justify-center h-full">
+              <p className="font-mono text-sm text-sa-green-ink/50 animate-pulse">Cargando menú…</p>
+            </div>
+          ) : (
+            <CatalogoBusqueda
+              productos={productos}
+              categorias={categorias}
+            />
+          )}
         </div>
 
         {/* Right: Order panel */}

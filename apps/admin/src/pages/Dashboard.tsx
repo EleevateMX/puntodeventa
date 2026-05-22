@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { useReportes } from '../hooks/useReportes'
 import { useInventario } from '../hooks/useInventario'
 import { useEmpleados } from '../hooks/useEmpleados'
+import { getOrdenesRecientes, isSupabaseConfigured, supabase } from '@pos/supabase'
+import type { OrdenActivaRow } from '@pos/supabase'
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -136,6 +138,32 @@ export function Dashboard() {
   }, [])
   const { fecha, hora } = formatDateTime(now)
 
+  // Live orders from Supabase
+  const SUCURSAL_ID = '00000000-0000-0000-0000-000000000001'
+  const [ordenesVivo, setOrdenesVivo] = useState<OrdenActivaRow[]>([])
+
+  useEffect(() => {
+    if (!isSupabaseConfigured) return
+
+    const fetchOrdenes = () => {
+      getOrdenesRecientes(SUCURSAL_ID, 4)
+        .then(setOrdenesVivo)
+        .catch((err: unknown) => console.error('[Dashboard] Error fetching ordenes recientes:', err))
+    }
+
+    fetchOrdenes()
+
+    const channel = supabase
+      .channel('dashboard-live')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'ordenes' }, () => fetchOrdenes())
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'ordenes' }, () => fetchOrdenes())
+      .subscribe()
+
+    return () => {
+      void supabase.removeChannel(channel)
+    }
+  }, [])
+
   // KPI computations
   const hoyVenta = ventasPorDia[ventasPorDia.length - 1]
   const ayerVenta = ventasPorDia[ventasPorDia.length - 2]
@@ -148,6 +176,20 @@ export function Dashboard() {
 
   const empleadosActivos = empleados.filter((e) => e.activo).length
   const empleadosTotales = empleados.length
+
+  // En cocina: derived from live orders (or demo fallback)
+  const ordenesParaKPI = ordenesVivo.length > 0 ? ordenesVivo : null
+  const enCocinaCount = ordenesParaKPI
+    ? ordenesParaKPI.filter(
+        (o) => o.estado === 'pendiente' || o.estado === 'en_preparacion' || o.estado === 'lista',
+      ).length
+    : 6
+  const nuevasCount = ordenesParaKPI
+    ? ordenesParaKPI.filter((o) => o.estado === 'pendiente').length
+    : 3
+  const preparandoCount = ordenesParaKPI
+    ? ordenesParaKPI.filter((o) => o.estado === 'en_preparacion').length
+    : 3
 
   // Last 7 days for chart
   const ultimos7 = useMemo(
@@ -215,8 +257,8 @@ export function Dashboard() {
             </div>
             <span className="text-2xl">🍳</span>
           </div>
-          <p className="text-4xl font-display text-sa-green-ink leading-none">6</p>
-          <p className="text-xs mt-3 text-sa-green-ink/60">3 nuevas · 3 preparando</p>
+          <p className="text-4xl font-display text-sa-green-ink leading-none">{enCocinaCount}</p>
+          <p className="text-xs mt-3 text-sa-green-ink/60">{nuevasCount} nuevas · {preparandoCount} preparando</p>
         </div>
 
         <div className="bg-white rounded-sa p-5 shadow-sa-sm border border-sa-green-ink/5 transition-all hover:shadow-sa hover:-translate-y-0.5">

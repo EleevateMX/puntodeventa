@@ -1,4 +1,10 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
+import {
+  getVentasDiarias,
+  getProductosMasVendidos,
+  isSupabaseConfigured,
+} from '@pos/supabase'
+import type { VentaDiaRow, ProductoVendidoRow } from '@pos/supabase'
 
 export interface VentaDia {
   fecha: string // 'YYYY-MM-DD'
@@ -108,10 +114,55 @@ function filtrarDias(dias: VentaDia[], periodo: Periodo): VentaDia[] {
   return dias.slice(-n)
 }
 
+function mapVentaDiaRow(row: VentaDiaRow): VentaDia {
+  return {
+    fecha: row.dia,
+    total: Number(row.total_ventas),
+    num_ordenes: Number(row.num_ordenes),
+    ticket_promedio: Number(row.ticket_promedio),
+  }
+}
+
+function mapProductoVendidoRow(row: ProductoVendidoRow): VentaProducto {
+  return {
+    producto_id: row.id,
+    nombre: row.nombre,
+    cantidad: Number(row.total_vendido),
+    total: Number(row.total_ingresos),
+  }
+}
+
 export function useReportes() {
   const [periodo, setPeriodo] = useState<Periodo>('30d')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [realVentasDias, setRealVentasDias] = useState<VentaDia[] | null>(null)
+  const [realProductos, setRealProductos] = useState<VentaProducto[] | null>(null)
 
-  const ventasPorDia = useMemo(() => filtrarDias(TODOS_LOS_DIAS, periodo), [periodo])
+  useEffect(() => {
+    if (!isSupabaseConfigured) return
+
+    setLoading(true)
+    setError(null)
+
+    Promise.all([getVentasDiarias(90), getProductosMasVendidos(10)])
+      .then(([ventasRows, productosRows]) => {
+        setRealVentasDias(ventasRows.map(mapVentaDiaRow))
+        setRealProductos(productosRows.map(mapProductoVendidoRow))
+      })
+      .catch((err: unknown) => {
+        console.error('[useReportes] Error fetching Supabase data:', err)
+        setRealVentasDias(null)
+        setRealProductos(null)
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }, [])
+
+  const todosLosDias = realVentasDias ?? TODOS_LOS_DIAS
+
+  const ventasPorDia = useMemo(() => filtrarDias(todosLosDias, periodo), [todosLosDias, periodo])
 
   const totalPeriodo = useMemo(
     () => ventasPorDia.reduce((s, d) => s + d.total, 0),
@@ -140,13 +191,16 @@ export function useReportes() {
   )
 
   const productosMasVendidos = useMemo((): VentaProducto[] => {
+    if (realProductos !== null) {
+      return [...realProductos].sort((a, b) => b.cantidad - a.cantidad)
+    }
     const factor = periodo === '7d' ? 7 / 30 : periodo === '90d' ? 3 : 1
     return PRODUCTOS_DEMO.map((p) => ({
       ...p,
       cantidad: Math.round(p.cantidad * factor),
       total: Math.round(p.total * factor),
     })).sort((a, b) => b.cantidad - a.cantidad)
-  }, [periodo])
+  }, [realProductos, periodo])
 
   const ventasPorMetodo = useMemo(() => computarMetodos(ventasPorDia), [ventasPorDia])
 
@@ -163,5 +217,7 @@ export function useReportes() {
     totalOrdenes,
     ticketPromedio,
     diaMayorVenta,
+    loading,
+    error,
   }
 }

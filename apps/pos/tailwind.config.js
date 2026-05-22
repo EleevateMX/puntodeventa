@@ -1,10 +1,8 @@
+import brandPreset from '@pos/brand/tailwind-preset'
+
 /** @type {import('tailwindcss').Config} */
 export default {
+  presets: [brandPreset],
   content: ['./index.html', './src/**/*.{ts,tsx}'],
-  theme: {
-    extend: {
-      fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
-    },
-  },
   plugins: [],
 }

@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { isSupabaseConfigured, getCocinaIdPorSlug, getOrdenesPorCocina, suscribirseAOrdenes, actualizarEstadoOrden } from '@pos/supabase'
+import type { CocinaSlug } from '@pos/supabase'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type EstadoKDS = 'nueva' | 'en_preparacion' | 'lista'
-type Canal = 'mesa' | 'kiosko' | 'delivery'
+type Canal = 'pos' | 'mesa' | 'kiosko' | 'delivery'
 
 interface OrdenItem {
   id: string
@@ -24,7 +26,7 @@ interface Orden {
 }
 
 interface Props {
-  cocinaSlug: string
+  cocinaSlug: CocinaSlug
   titulo: string
   color: 'orange' | 'blue'
 }
@@ -148,18 +150,21 @@ function playBeep() {
 // ─── Canal badge ──────────────────────────────────────────────────────────────
 
 const CANAL_LABELS: Record<Canal, string> = {
+  pos: 'POS',
   mesa: 'Mesa',
   kiosko: 'Kiosko',
   delivery: 'Delivery',
 }
 
 const CANAL_EMOJI: Record<Canal, string> = {
+  pos: '💵',
   mesa: '🍽️',
   kiosko: '🖥️',
   delivery: '🛵',
 }
 
 const CANAL_CLASSES: Record<Canal, string> = {
+  pos: 'bg-sa-green text-sa-cream',
   mesa: 'bg-sa-mint text-sa-green-ink',
   kiosko: 'bg-sa-blueberry text-white',
   delivery: 'bg-sa-mango text-white',
@@ -168,7 +173,8 @@ const CANAL_CLASSES: Record<Canal, string> = {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function PantallaComandas({ cocinaSlug, titulo, color: _color }: Props) {
-  const [ordenes, setOrdenes] = useState<Orden[]>(DEMO_ORDENES)
+  const [ordenes, setOrdenes] = useState<Orden[]>(isSupabaseConfigured ? [] : DEMO_ORDENES)
+  const [cocinaId, setCocinaId] = useState<string | null>(null)
   const [now, setNow] = useState(Date.now())
   const [fadingOut, setFadingOut] = useState<Set<string>>(new Set())
 
@@ -191,59 +197,61 @@ export function PantallaComandas({ cocinaSlug, titulo, color: _color }: Props) {
     })
   }, [ordenes])
 
-  // Supabase real-time subscription (only when env vars are configured).
+  // Resolve slug to cocinaId on mount
   useEffect(() => {
-    const meta = (import.meta as unknown as Record<string, Record<string, unknown>>)
-    const env = meta['env'] ?? {}
-    const url = env['VITE_SUPABASE_URL'] as string | undefined
-    const key = env['VITE_SUPABASE_ANON_KEY'] as string | undefined
-    if (!url || !key) return
-
-    const PKG = '@pos/supabase'
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let channel: any = null
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async function loadOrdenes(mod: any) {
-      try {
-        const data = await mod.getOrdenesPorCocina(cocinaSlug)
-        if (data) {
-          setOrdenes(
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (data as any[]).map((o: any) => ({
-              ...o,
-              estado: (o.estado as EstadoKDS) ?? 'nueva',
-              canal: (o.canal as Canal) ?? 'mesa',
-            })),
-          )
-        }
-      } catch (err) {
-        console.error('Error cargando órdenes:', err)
-      }
-    }
-
-    async function init() {
-      try {
-        const mod = await import(/* @vite-ignore */ PKG)
-        await loadOrdenes(mod)
-        channel = mod.suscribirseAOrdenes(cocinaSlug, () => loadOrdenes(mod))
-      } catch (err) {
-        console.error('Error inicializando Supabase:', err)
-      }
-    }
-
-    init()
-
-    return () => {
-      channel?.unsubscribe()
-    }
+    if (!isSupabaseConfigured) return
+    getCocinaIdPorSlug(cocinaSlug)
+      .then(id => { if (id) setCocinaId(id) })
+      .catch(console.error)
   }, [cocinaSlug])
+
+  // Load orders and subscribe when cocinaId is available
+  useEffect(() => {
+    if (!cocinaId) return
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    function mapOrdenes(data: any[]): Orden[] {
+      return data.map(o => ({
+        id: o.id,
+        folio: o.folio,
+        estado: (o.estado as EstadoKDS) ?? 'nueva',
+        canal: (o.canal as Canal) ?? 'pos',
+        created_at: o.created_at,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        orden_items: (o.orden_items ?? []).map((item: any) => ({
+          id: item.id,
+          cantidad: item.cantidad,
+          personalizacion: item.personalizacion ?? null,
+          productos: item.productos ?? null,
+        })),
+      }))
+    }
+
+    // Initial load
+    getOrdenesPorCocina(cocinaId)
+      .then(data => { setOrdenes(mapOrdenes(data)) })
+      .catch(console.error)
+
+    // Realtime subscription
+    const channel = suscribirseAOrdenes(cocinaId, () => {
+      getOrdenesPorCocina(cocinaId)
+        .then(data => { setOrdenes(mapOrdenes(data)) })
+        .catch(console.error)
+    })
+
+    return () => { channel.unsubscribe() }
+  }, [cocinaId])
 
   // State machine actions
   function iniciarPreparacion(id: string) {
+    // Optimistic local update
     setOrdenes((prev) =>
       prev.map((o) => (o.id === id ? { ...o, estado: 'en_preparacion' as EstadoKDS } : o)),
     )
+    // Persist to DB (fire and forget, don't block UI)
+    if (isSupabaseConfigured) {
+      actualizarEstadoOrden(id, 'en_preparacion').catch(console.error)
+    }
   }
 
   function marcarLista(id: string) {
@@ -251,6 +259,11 @@ export function PantallaComandas({ cocinaSlug, titulo, color: _color }: Props) {
       prev.map((o) => (o.id === id ? { ...o, estado: 'lista' as EstadoKDS, completada_at: Date.now() } : o)),
     )
     setFadingOut((prev) => new Set([...prev, id]))
+
+    if (isSupabaseConfigured) {
+      actualizarEstadoOrden(id, 'lista').catch(console.error)
+    }
+
     setTimeout(() => {
       setOrdenes((prev) => prev.filter((o) => o.id !== id))
       setFadingOut((prev) => {
@@ -258,6 +271,10 @@ export function PantallaComandas({ cocinaSlug, titulo, color: _color }: Props) {
         next.delete(id)
         return next
       })
+      // Mark as entregada in DB after removal
+      if (isSupabaseConfigured) {
+        actualizarEstadoOrden(id, 'entregada').catch(console.error)
+      }
     }, 3000)
   }
 

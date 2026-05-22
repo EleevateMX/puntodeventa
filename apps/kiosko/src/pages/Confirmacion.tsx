@@ -1,14 +1,17 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 
 export function Confirmacion() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const folioReal = (location.state as { folio?: string | null } | null)?.folio ?? null
   const [segundos, setSegundos] = useState(8)
 
-  const numeroOrden = useMemo(
+  const fallbackNumero = useMemo(
     () => Math.floor(100 + Math.random() * 900).toString().padStart(3, '0'),
     [],
   )
+  const numeroOrden = folioReal ?? fallbackNumero
 
   useEffect(() => {
     const timer = setTimeout(() => navigate('/catalogo'), 8000)

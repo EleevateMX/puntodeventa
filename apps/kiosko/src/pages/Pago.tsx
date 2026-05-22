@@ -1,22 +1,52 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { crearOrden, isSupabaseConfigured } from '@pos/supabase'
 import { useCarrito } from '@/store/carritoStore'
 
 type MetodoPago = 'terminal' | 'efectivo'
 
 export function Pago() {
   const navigate = useNavigate()
-  const { total, limpiar } = useCarrito()
+  const { items, total, limpiar } = useCarrito()
   const [metodo, setMetodo] = useState<MetodoPago | null>(null)
   const [procesando, setProcesando] = useState(false)
 
   async function confirmarPago() {
     if (!metodo) return
     setProcesando(true)
-    // TODO: integrar Mercado Pago SDK
-    await new Promise((r) => setTimeout(r, 1500))
+
+    let folio: string | null = null
+
+    if (isSupabaseConfigured) {
+      try {
+        const mapMetodo = metodo === 'terminal' ? 'tarjeta_debito' : 'efectivo'
+        const orden = await crearOrden(
+          {
+            sucursal_id: '00000000-0000-0000-0000-000000000001',
+            canal: 'kiosko',
+            metodo_pago: mapMetodo,
+            total: total(),
+          },
+          items.map(i => ({
+            producto_id: i.producto_id,
+            cantidad: i.cantidad,
+            precio_unitario: i.precio,
+            cocina_id: i.cocina_id,
+            personalizacion: i.personalizacion ?? null,
+          }))
+        )
+        folio = String(orden.folio)
+      } catch (e) {
+        console.error('[Kiosko] Error guardando orden:', e)
+      }
+    } else {
+      // Offline: simulate payment delay
+      await new Promise((r) => setTimeout(r, 1500))
+    }
+
     limpiar()
-    navigate('/confirmacion')
+    navigate('/confirmacion', { state: { folio } })
+    setProcesando(false)
   }
 
   return (

@@ -1,5 +1,5 @@
 import { supabase } from '../client'
-import type { Database } from '../types/database'
+import type { Database, CocinaSlug } from '../types/database'
 
 type MetodoPago = Database['public']['Enums']['metodo_pago']
 type CanalOrden = Database['public']['Enums']['canal_orden']
@@ -39,7 +39,7 @@ export async function crearOrden(input: CrearOrdenInput, items: ItemOrden[]) {
       descuento: input.descuento ?? 0,
       cliente_id: input.cliente_id ?? null,
       notas: input.notas ?? null,
-      estado: 'entregada',
+      estado: 'pendiente',
       pagado: true,
     })
     .select('id, folio')
@@ -96,30 +96,33 @@ export async function actualizarEstadoOrden(
   return data
 }
 
-export async function getOrdenesPorCocina(
-  cocinaId: string,
-  estado?: Database['public']['Enums']['estado_orden'],
-) {
-  let query = supabase
+export async function getCocinaIdPorSlug(slug: CocinaSlug): Promise<string | null> {
+  const { data } = await supabase
+    .from('cocinas')
+    .select('id')
+    .eq('slug', slug)
+    .single()
+  return data?.id ?? null
+}
+
+export async function getOrdenesPorCocina(cocinaId: string) {
+  const { data, error } = await supabase
     .from('ordenes')
     .select(
-      `*,
+      `id, folio, estado, canal, created_at,
       orden_items!inner(
-        id, cantidad, precio_unitario, personalizacion, cocina_id,
+        id, cantidad, personalizacion, cocina_id,
         productos(id, nombre)
       )`,
     )
     .eq('orden_items.cocina_id', cocinaId)
     .eq('pagado', true)
+    .not('estado', 'in', '("entregada","cancelada")')
     .order('created_at', { ascending: true })
+    .limit(40)
 
-  if (estado) {
-    query = query.eq('estado', estado)
-  }
-
-  const { data, error } = await query
   if (error) throw error
-  return data
+  return data ?? []
 }
 
 export function suscribirseAOrdenes(
@@ -127,15 +130,15 @@ export function suscribirseAOrdenes(
   callback: (payload: unknown) => void,
 ) {
   return supabase
-    .channel(`ordenes-cocina-${cocinaId}`)
+    .channel(`kds-${cocinaId}`)
     .on(
       'postgres_changes',
-      {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'orden_items',
-        filter: `cocina_id=eq.${cocinaId}`,
-      },
+      { event: 'INSERT', schema: 'public', table: 'orden_items', filter: `cocina_id=eq.${cocinaId}` },
+      callback,
+    )
+    .on(
+      'postgres_changes',
+      { event: 'UPDATE', schema: 'public', table: 'ordenes' },
       callback,
     )
     .subscribe()

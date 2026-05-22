@@ -1,5 +1,5 @@
 export { supabase, isSupabaseConfigured } from './client'
-export type { Database } from './types/database'
+export type { Database, CocinaSlug } from './types/database'
 export * from './queries/productos'
 export * from './queries/ordenes'
 export * from './queries/menu'

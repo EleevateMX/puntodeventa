@@ -6,3 +6,7 @@ dist/
 .turbo/
 out/
 release/
+
+# local dev tooling
+/screenshot.cjs
+/screenshots/

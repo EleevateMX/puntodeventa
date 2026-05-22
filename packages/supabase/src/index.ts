@@ -1,4 +1,4 @@
-export { supabase } from './client'
+export { supabase, isSupabaseConfigured } from './client'
 export type { Database } from './types/database'
 export * from './queries/productos'
 export * from './queries/ordenes'

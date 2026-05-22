@@ -19,6 +19,31 @@ interface Producto {
   categorias: Categoria | null
 }
 
+const COC_ALIMENTOS = { id: 'c-1', nombre: 'Cocina', slug: 'alimentos' }
+const COC_BEBIDAS = { id: 'c-2', nombre: 'Barra', slug: 'bebidas' }
+
+const CAT_SHAKES: Categoria = { id: 'cat-shakes', nombre: 'Shakes', cocinas: COC_BEBIDAS }
+const CAT_BOWLS:  Categoria = { id: 'cat-bowls',  nombre: 'Bowls',  cocinas: COC_ALIMENTOS }
+const CAT_SNACKS: Categoria = { id: 'cat-snacks', nombre: 'Snacks', cocinas: COC_ALIMENTOS }
+const CAT_CAFE:   Categoria = { id: 'cat-cafe',   nombre: 'Café',   cocinas: COC_BEBIDAS }
+
+const DEMO_CATEGORIAS: Categoria[] = [CAT_SHAKES, CAT_BOWLS, CAT_SNACKS, CAT_CAFE]
+
+const DEMO_PRODUCTOS: Producto[] = [
+  { id: 'p-1',  nombre: 'Shake Fresa-Banana', descripcion: '40g proteína, fruta real, leche o avena',   precio:  95, imagen_url: null, categoria_id: 'cat-shakes', categorias: CAT_SHAKES },
+  { id: 'p-2',  nombre: 'Shake Chocolate',    descripcion: '35g proteína, cacao, plátano',              precio:  90, imagen_url: null, categoria_id: 'cat-shakes', categorias: CAT_SHAKES },
+  { id: 'p-3',  nombre: 'Shake Mango',        descripcion: '32g proteína, mango fresco',                precio:  90, imagen_url: null, categoria_id: 'cat-shakes', categorias: CAT_SHAKES },
+  { id: 'p-4',  nombre: 'Shake Café',         descripcion: '30g proteína, espresso doble',              precio:  95, imagen_url: null, categoria_id: 'cat-shakes', categorias: CAT_SHAKES },
+  { id: 'p-5',  nombre: 'Bowl Pollo Power',   descripcion: 'Pollo, arroz, vegetales, salsa de la casa', precio: 145, imagen_url: null, categoria_id: 'cat-bowls',  categorias: CAT_BOWLS },
+  { id: 'p-6',  nombre: 'Bowl Veggie',        descripcion: 'Quinoa, garbanzo, vegetales, tahini',       precio: 130, imagen_url: null, categoria_id: 'cat-bowls',  categorias: CAT_BOWLS },
+  { id: 'p-7',  nombre: 'Bowl Atún',          descripcion: 'Atún sellado, aguacate, edamame',           precio: 155, imagen_url: null, categoria_id: 'cat-bowls',  categorias: CAT_BOWLS },
+  { id: 'p-8',  nombre: 'Wrap Pollo',         descripcion: 'Tortilla integral, pollo, vegetales',       precio: 110, imagen_url: null, categoria_id: 'cat-snacks', categorias: CAT_SNACKS },
+  { id: 'p-9',  nombre: 'Barrita Brownie',    descripcion: '20g proteína, cero culpa',                  precio:  55, imagen_url: null, categoria_id: 'cat-snacks', categorias: CAT_SNACKS },
+  { id: 'p-10', nombre: 'Energy Balls',       descripcion: 'Dátil, avena, cacao (6 pzs)',               precio:  65, imagen_url: null, categoria_id: 'cat-snacks', categorias: CAT_SNACKS },
+  { id: 'p-11', nombre: 'Café Americano',     descripcion: 'Granos de origen',                          precio:  45, imagen_url: null, categoria_id: 'cat-cafe',   categorias: CAT_CAFE },
+  { id: 'p-12', nombre: 'Latte Vainilla',     descripcion: 'Espresso + leche al vapor',                 precio:  60, imagen_url: null, categoria_id: 'cat-cafe',   categorias: CAT_CAFE },
+]
+
 export function Catalogo() {
   const navigate = useNavigate()
   const { agregar, totalItems } = useCarrito()
@@ -28,7 +53,8 @@ export function Catalogo() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Placeholder: cargar productos desde Supabase cuando esté configurado
+    setCategorias(DEMO_CATEGORIAS)
+    setProductos(DEMO_PRODUCTOS)
     setLoading(false)
   }, [])
 

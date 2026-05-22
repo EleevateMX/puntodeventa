@@ -1,6 +1,7 @@
 import { supabase } from '../client'
+import type { CocinaSlug } from '../types/database'
 
-export async function getProductosPorCocina(cocinaSlug: string) {
+export async function getProductosPorCocina(cocinaSlug: CocinaSlug) {
   const { data, error } = await supabase
     .from('productos')
     .select(`

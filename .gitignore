@@ -10,3 +10,5 @@ release/
 # local dev tooling
 /screenshot.cjs
 /screenshots/
+/dist-pages/
+shot-*.cjs

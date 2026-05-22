@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { crearOrden, isSupabaseConfigured } from '@pos/supabase'
+import { crearOrden, agregarPuntosCliente, isSupabaseConfigured } from '@pos/supabase'
 import { useCarrito } from '@/store/carritoStore'
 
 type MetodoPago = 'terminal' | 'efectivo'
 
 export function Pago() {
   const navigate = useNavigate()
-  const { items, total, limpiar } = useCarrito()
+  const { items, total, usuario, limpiar } = useCarrito()
   const [metodo, setMetodo] = useState<MetodoPago | null>(null)
   const [procesando, setProcesando] = useState(false)
 
@@ -15,6 +15,7 @@ export function Pago() {
     if (!metodo) return
     setProcesando(true)
 
+    const totalOrden = total()
     let folio: string | null = null
 
     if (isSupabaseConfigured) {
@@ -25,9 +26,10 @@ export function Pago() {
             sucursal_id: '00000000-0000-0000-0000-000000000001',
             canal: 'kiosko',
             metodo_pago: mapMetodo,
-            total: total(),
+            total: totalOrden,
+            cliente_id: usuario?.clienteId ?? null,
           },
-          items.map(i => ({
+          items.map((i) => ({
             producto_id: i.producto_id,
             cantidad: i.cantidad,
             precio_unitario: i.precio,
@@ -36,16 +38,23 @@ export function Pago() {
           }))
         )
         folio = String(orden.folio)
+
+        // Award loyalty points — never blocks checkout
+        if (usuario?.clienteId) {
+          const puntos = Math.floor(totalOrden / 10)
+          if (puntos > 0) {
+            agregarPuntosCliente(usuario.clienteId, puntos, orden.id).catch(console.error)
+          }
+        }
       } catch (e) {
         console.error('[Kiosko] Error guardando orden:', e)
       }
     } else {
-      // Offline: simulate payment delay
       await new Promise((r) => setTimeout(r, 1500))
     }
 
     limpiar()
-    navigate('/confirmacion', { state: { folio } })
+    navigate('/confirmacion', { state: { folio, total: totalOrden } })
     setProcesando(false)
   }
 

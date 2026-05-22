@@ -295,3 +295,13 @@ export async function descontarGiftCard(
 
   if (error) throw error
 }
+
+export async function buscarClientePorEmail(email: string) {
+  const { data } = await supabase
+    .from('clientes')
+    .select('*')
+    .eq('email', email)
+    .eq('activo', true)
+    .limit(1)
+  return data?.[0] ?? null
+}

@@ -107,7 +107,7 @@ export function Carrito() {
           </span>
         </div>
         <button
-          onClick={() => navigate('/pago')}
+          onClick={() => navigate('/lealtad')}
           className="w-full bg-sa-strawberry text-white py-5 rounded-full font-display text-3xl shadow-sa-sm active:scale-[0.98] transition-transform"
         >
           A pagar

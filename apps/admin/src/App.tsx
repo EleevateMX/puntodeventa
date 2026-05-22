@@ -4,12 +4,14 @@ import { Dashboard } from './pages/Dashboard'
 import { Menu } from './pages/Menu'
 import { Inventario } from './pages/Inventario'
 import { Ventas } from './pages/Ventas'
+import { Roles } from './pages/Roles'
 
 const navItems = [
   { to: '/dashboard', label: 'Dashboard', icon: '📊' },
   { to: '/menu', label: 'Menú', icon: '🍽️' },
   { to: '/inventario', label: 'Inventario', icon: '📦' },
   { to: '/ventas', label: 'Ventas', icon: '💰' },
+  { to: '/roles', label: 'Empleados', icon: '👥' },
 ]
 
 export default function App() {
@@ -48,6 +50,7 @@ export default function App() {
           <Route path="/menu" element={<Menu />} />
           <Route path="/inventario" element={<Inventario />} />
           <Route path="/ventas" element={<Ventas />} />
+          <Route path="/roles" element={<Roles />} />
         </Routes>
       </main>
     </div>

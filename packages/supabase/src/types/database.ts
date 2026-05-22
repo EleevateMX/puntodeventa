@@ -172,9 +172,9 @@ export interface Database {
         Relationships: []
       }
       promociones: {
-        Row: { id: string; nombre: string; descripcion: string | null; tipo: TipoPromocion; valor: number | null; codigo: string | null; activa: boolean; aplica_a: string | null; referencia_id: string | null; fecha_inicio: string | null; fecha_fin: string | null; sucursal_id: string | null; condiciones: Json | null; created_at: string }
-        Insert: { id?: string; nombre: string; descripcion?: string | null; tipo: TipoPromocion; valor?: number | null; codigo?: string | null; activa?: boolean; aplica_a?: string | null; referencia_id?: string | null; fecha_inicio?: string | null; fecha_fin?: string | null; sucursal_id?: string | null; condiciones?: Json | null; created_at?: string }
-        Update: { id?: string; nombre?: string; descripcion?: string | null; tipo?: TipoPromocion; valor?: number | null; codigo?: string | null; activa?: boolean; aplica_a?: string | null; referencia_id?: string | null; fecha_inicio?: string | null; fecha_fin?: string | null; sucursal_id?: string | null; condiciones?: Json | null }
+        Row: { id: string; nombre: string; descripcion: string | null; tipo: TipoPromocion; valor: number | null; codigo: string | null; activa: boolean; aplica_a: string | null; referencia_id: string | null; fecha_inicio: string | null; fecha_fin: string | null; horas_inicio: string | null; horas_fin: string | null; sucursal_id: string | null; condiciones: Json | null; created_at: string }
+        Insert: { id?: string; nombre: string; descripcion?: string | null; tipo: TipoPromocion; valor?: number | null; codigo?: string | null; activa?: boolean; aplica_a?: string | null; referencia_id?: string | null; fecha_inicio?: string | null; fecha_fin?: string | null; horas_inicio?: string | null; horas_fin?: string | null; sucursal_id?: string | null; condiciones?: Json | null; created_at?: string }
+        Update: { id?: string; nombre?: string; descripcion?: string | null; tipo?: TipoPromocion; valor?: number | null; codigo?: string | null; activa?: boolean; aplica_a?: string | null; referencia_id?: string | null; fecha_inicio?: string | null; fecha_fin?: string | null; horas_inicio?: string | null; horas_fin?: string | null; sucursal_id?: string | null; condiciones?: Json | null }
         Relationships: []
       }
       // ── RRHH ──
@@ -197,9 +197,9 @@ export interface Database {
         Relationships: []
       }
       cortes_caja: {
-        Row: { id: string; sucursal_id: string; empleado_id: string; turno_id: string | null; total_efectivo: number; total_tarjeta: number; total_qr: number; total_wallet: number; total_general: number; notas: string | null; created_at: string }
-        Insert: { id?: string; sucursal_id: string; empleado_id: string; turno_id?: string | null; total_efectivo?: number; total_tarjeta?: number; total_qr?: number; total_wallet?: number; total_general?: number; notas?: string | null; created_at?: string }
-        Update: { id?: string; sucursal_id?: string; empleado_id?: string; turno_id?: string | null; total_efectivo?: number; total_tarjeta?: number; total_qr?: number; total_wallet?: number; total_general?: number; notas?: string | null }
+        Row: { id: string; sucursal_id: string; empleado_id: string; turno_id: string | null; fecha_inicio: string; fecha_fin: string; num_ordenes: number; total_efectivo: number; total_tarjeta: number; total_qr: number; total_wallet: number; total_general: number; notas: string | null; created_at: string }
+        Insert: { id?: string; sucursal_id: string; empleado_id: string; turno_id?: string | null; fecha_inicio: string; fecha_fin: string; num_ordenes?: number; total_efectivo?: number; total_tarjeta?: number; total_qr?: number; total_wallet?: number; total_general?: number; notas?: string | null; created_at?: string }
+        Update: { id?: string; sucursal_id?: string; empleado_id?: string; turno_id?: string | null; fecha_inicio?: string; fecha_fin?: string; num_ordenes?: number; total_efectivo?: number; total_tarjeta?: number; total_qr?: number; total_wallet?: number; total_general?: number; notas?: string | null }
         Relationships: []
       }
       // ── Usuarios ──

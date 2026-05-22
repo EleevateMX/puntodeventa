@@ -51,19 +51,19 @@ const ORDENES_DEMO: OrdenLive[] = [
 ]
 
 const ACTIVIDAD_DEMO = [
-  { id: 'a1', tiempo: 'Hace 2 min', accion: 'Ana García cobró $345.00', color: 'bg-green-500' },
-  { id: 'a2', tiempo: 'Hace 5 min', accion: 'Lote L-2024-002 marcado como vencido', color: 'bg-red-500' },
-  { id: 'a3', tiempo: 'Hace 8 min', accion: 'Nueva categoría creada: Postres', color: 'bg-blue-500' },
-  { id: 'a4', tiempo: 'Hace 15 min', accion: 'Carlos López inició turno', color: 'bg-orange-500' },
-  { id: 'a5', tiempo: 'Hace 23 min', accion: "Producto 'Café latte' actualizado", color: 'bg-purple-500' },
+  { id: 'a1', tiempo: 'Hace 2 min', accion: 'Ana García cobró $345.00', color: 'bg-sa-mint' },
+  { id: 'a2', tiempo: 'Hace 5 min', accion: 'Lote L-2024-002 marcado como vencido', color: 'bg-sa-strawberry' },
+  { id: 'a3', tiempo: 'Hace 8 min', accion: 'Nueva categoría creada: Postres', color: 'bg-sa-blueberry' },
+  { id: 'a4', tiempo: 'Hace 15 min', accion: 'Carlos López inició turno', color: 'bg-sa-mango' },
+  { id: 'a5', tiempo: 'Hace 23 min', accion: "Producto 'Café latte' actualizado", color: 'bg-sa-banana' },
 ]
 
 // ─── Sub-components ────────────────────────────────────────────────────────────
 
 const estadoStyles: Record<EstadoOrden, { bg: string; text: string; label: string }> = {
-  nueva: { bg: 'bg-blue-50', text: 'text-blue-700', label: 'Nueva' },
-  preparando: { bg: 'bg-orange-50', text: 'text-orange-700', label: 'Preparando' },
-  lista: { bg: 'bg-green-50', text: 'text-green-700', label: 'Lista' },
+  nueva: { bg: 'bg-sa-blueberry/15', text: 'text-sa-blueberry', label: 'Nueva' },
+  preparando: { bg: 'bg-sa-banana/30', text: 'text-sa-coffee', label: 'Preparando' },
+  lista: { bg: 'bg-sa-mint/30', text: 'text-sa-green-ink', label: 'Lista' },
 }
 
 function MiniBarChart({ data }: { data: { fecha: string; total: number }[] }) {
@@ -87,8 +87,8 @@ function MiniBarChart({ data }: { data: { fecha: string; total: number }[] }) {
         const y = PAD_T + chartH - chartH * pct
         return (
           <g key={pct}>
-            <line x1={PAD_L} y1={y} x2={PAD_L + chartW} y2={y} stroke="#f3f4f6" strokeWidth={1} />
-            <text x={PAD_L - 6} y={y + 4} fontSize={10} fill="#9ca3af" textAnchor="end">
+            <line x1={PAD_L} y1={y} x2={PAD_L + chartW} y2={y} stroke="rgba(20,36,29,0.08)" strokeWidth={1} />
+            <text x={PAD_L - 6} y={y + 4} fontSize={10} fill="rgba(20,36,29,0.5)" textAnchor="end" fontFamily="DM Mono, monospace">
               {Math.round((roundedMax * pct) / 100) * 100}
             </text>
           </g>
@@ -103,13 +103,14 @@ function MiniBarChart({ data }: { data: { fecha: string; total: number }[] }) {
         })
         return (
           <g key={d.fecha}>
-            <rect x={x} y={y} width={barW} height={barH} rx={4} fill="#f97316" />
+            <rect x={x} y={y} width={barW} height={barH} rx={4} fill="#2C4A3E" />
             <text
               x={x + barW / 2}
               y={PAD_T + chartH + 16}
               fontSize={10}
-              fill="#6b7280"
+              fill="rgba(20,36,29,0.6)"
               textAnchor="middle"
+              fontFamily="DM Mono, monospace"
             >
               {label}
             </text>
@@ -159,32 +160,32 @@ export function Dashboard() {
   const totalAlertas = alertasStock.length + lotesVencidos.length + lotesPorVencer.length
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen">
+    <div className="p-8 bg-sa-cream-paper min-h-screen">
       {/* Header */}
       <div className="flex items-start justify-between mb-8 flex-wrap gap-4">
         <div>
-          <h2 className="text-3xl font-extrabold text-gray-900">Dashboard</h2>
-          <p className="text-gray-500 text-sm mt-1 capitalize">
-            {fecha} · <span className="font-mono text-gray-700">{hora}</span>
+          <h2 className="text-4xl font-display text-sa-green-ink tracking-wide">Dashboard</h2>
+          <p className="text-sa-green-ink/60 text-sm mt-2 capitalize">
+            {fecha} · <span className="font-mono text-sa-green-ink/80">{hora}</span>
           </p>
         </div>
-        <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-full px-4 py-2 shadow-sm">
-          <span className="w-2 h-2 rounded-full bg-green-500"></span>
-          <span className="text-sm font-medium text-gray-700">Sucursal: Principal</span>
+        <div className="flex items-center gap-2 bg-white border border-sa-green-ink/10 rounded-full px-4 py-2 shadow-sa-sm">
+          <span className="w-2 h-2 rounded-full bg-sa-mint"></span>
+          <span className="text-sm font-medium text-sa-green-ink">Sucursal: Principal</span>
         </div>
       </div>
 
       {/* KPI Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 transition-all hover:shadow-md hover:-translate-y-0.5">
+        <div className="bg-white rounded-sa p-5 shadow-sa-sm border border-sa-green-ink/5 transition-all hover:shadow-sa hover:-translate-y-0.5">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-sm text-gray-500 font-medium">Ventas de hoy</span>
+            <span className="text-xs text-sa-green-ink/60 font-mono uppercase tracking-wide">Ventas de hoy</span>
             <span className="text-2xl">💰</span>
           </div>
-          <p className="text-3xl font-extrabold text-gray-900">{formatCurrency(totalHoy)}</p>
+          <p className="text-4xl font-display text-sa-green-ink leading-none">{formatCurrency(totalHoy)}</p>
           <p
-            className={`text-xs mt-2 font-semibold ${
-              cambioPct >= 0 ? 'text-green-600' : 'text-red-600'
+            className={`text-xs mt-3 font-mono ${
+              cambioPct >= 0 ? 'text-sa-green' : 'text-sa-strawberry'
             }`}
           >
             {cambioPct >= 0 ? '+' : ''}
@@ -192,39 +193,39 @@ export function Dashboard() {
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 transition-all hover:shadow-md hover:-translate-y-0.5">
+        <div className="bg-white rounded-sa p-5 shadow-sa-sm border border-sa-green-ink/5 transition-all hover:shadow-sa hover:-translate-y-0.5">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-sm text-gray-500 font-medium">Órdenes hoy</span>
+            <span className="text-xs text-sa-green-ink/60 font-mono uppercase tracking-wide">Órdenes hoy</span>
             <span className="text-2xl">🧾</span>
           </div>
-          <p className="text-3xl font-extrabold text-gray-900">{ordenesHoy}</p>
-          <p className="text-xs mt-2 text-gray-500">
-            Ticket promedio {formatCurrency(ticketHoy)}
+          <p className="text-4xl font-display text-sa-green-ink leading-none">{ordenesHoy}</p>
+          <p className="text-xs mt-3 text-sa-green-ink/60">
+            Ticket promedio <span className="font-mono text-sa-green-ink/80">{formatCurrency(ticketHoy)}</span>
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 transition-all hover:shadow-md hover:-translate-y-0.5">
+        <div className="bg-white rounded-sa p-5 shadow-sa-sm border border-sa-green-ink/5 transition-all hover:shadow-sa hover:-translate-y-0.5">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-500 font-medium">En cocina ahora</span>
+              <span className="text-xs text-sa-green-ink/60 font-mono uppercase tracking-wide">En cocina ahora</span>
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500 animate-pulse"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sa-strawberry opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-sa-strawberry animate-pulse"></span>
               </span>
             </div>
             <span className="text-2xl">🍳</span>
           </div>
-          <p className="text-3xl font-extrabold text-gray-900">6</p>
-          <p className="text-xs mt-2 text-gray-500">3 nuevas · 3 preparando</p>
+          <p className="text-4xl font-display text-sa-green-ink leading-none">6</p>
+          <p className="text-xs mt-3 text-sa-green-ink/60">3 nuevas · 3 preparando</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 transition-all hover:shadow-md hover:-translate-y-0.5">
+        <div className="bg-white rounded-sa p-5 shadow-sa-sm border border-sa-green-ink/5 transition-all hover:shadow-sa hover:-translate-y-0.5">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-sm text-gray-500 font-medium">Empleados activos</span>
+            <span className="text-xs text-sa-green-ink/60 font-mono uppercase tracking-wide">Empleados activos</span>
             <span className="text-2xl">👥</span>
           </div>
-          <p className="text-3xl font-extrabold text-gray-900">{empleadosActivos}</p>
-          <p className="text-xs mt-2 text-gray-500">de {empleadosTotales} totales</p>
+          <p className="text-4xl font-display text-sa-green-ink leading-none">{empleadosActivos}</p>
+          <p className="text-xs mt-3 text-sa-green-ink/60">de {empleadosTotales} totales</p>
         </div>
       </div>
 
@@ -233,12 +234,12 @@ export function Dashboard() {
         {/* Left column */}
         <div className="lg:col-span-2 space-y-6">
           {/* A — Ventas últimos 7 días */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <div className="bg-white rounded-sa p-6 shadow-sa-sm border border-sa-green-ink/5">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-gray-900">Ventas últimos 7 días</h3>
+              <h3 className="text-xl font-display text-sa-green-ink">Ventas últimos 7 días</h3>
               <Link
                 to="/ventas"
-                className="text-xs font-medium text-orange-600 hover:text-orange-700"
+                className="text-xs font-mono text-sa-green hover:text-sa-green-deep uppercase tracking-wide"
               >
                 Ver detalle →
               </Link>
@@ -247,16 +248,16 @@ export function Dashboard() {
           </div>
 
           {/* B — Órdenes en vivo */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <div className="bg-white rounded-sa p-6 shadow-sa-sm border border-sa-green-ink/5">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <h3 className="text-lg font-bold text-gray-900">Órdenes en vivo</h3>
+                <h3 className="text-xl font-display text-sa-green-ink">Órdenes en vivo</h3>
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sa-mint opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-sa-mint"></span>
                 </span>
               </div>
-              <span className="text-xs text-gray-500">{ORDENES_DEMO.length} órdenes</span>
+              <span className="text-xs font-mono text-sa-green-ink/60">{ORDENES_DEMO.length} órdenes</span>
             </div>
             <div className="space-y-2">
               {ORDENES_DEMO.map((o) => {
@@ -264,21 +265,21 @@ export function Dashboard() {
                 return (
                   <div
                     key={o.id}
-                    className="flex items-center justify-between px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 hover:bg-gray-100 transition-colors"
+                    className="flex items-center justify-between px-4 py-3 rounded-sa bg-sa-cream-soft/60 border border-sa-green-ink/5 hover:bg-sa-cream-soft transition-colors"
                   >
                     <div className="flex items-center gap-3">
                       <span
-                        className={`text-xs font-semibold px-2.5 py-1 rounded-full ${style.bg} ${style.text}`}
+                        className={`text-xs font-mono uppercase tracking-wider px-2.5 py-1 rounded-full ${style.bg} ${style.text}`}
                       >
                         {style.label}
                       </span>
-                      <span className="font-mono text-sm font-bold text-gray-900">
+                      <span className="font-mono text-sm font-semibold text-sa-green-ink">
                         {o.folio}
                       </span>
                     </div>
                     <div className="flex items-center gap-4">
-                      <span className="text-xs text-gray-500">{o.minutos} min</span>
-                      <span className="text-sm font-bold text-gray-900">
+                      <span className="text-xs font-mono text-sa-green-ink/60">{o.minutos} min</span>
+                      <span className="text-sm font-mono font-semibold text-sa-green-ink">
                         {formatCurrency(o.total)}
                       </span>
                     </div>
@@ -292,60 +293,60 @@ export function Dashboard() {
         {/* Right column */}
         <div className="space-y-6">
           {/* C — Alertas */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Alertas</h3>
+          <div className="bg-white rounded-sa p-6 shadow-sa-sm border border-sa-green-ink/5">
+            <h3 className="text-xl font-display text-sa-green-ink mb-4">Alertas</h3>
             {totalAlertas === 0 ? (
-              <div className="text-center py-6 text-green-600 font-medium">
+              <div className="text-center py-6 text-sa-green font-medium">
                 Todo bajo control ✓
               </div>
             ) : (
               <div className="space-y-2">
                 {alertasStock.length > 0 && (
-                  <div className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-yellow-50 border border-yellow-100">
+                  <div className="flex items-center justify-between px-3 py-2.5 rounded-sa bg-sa-banana/20 border border-sa-banana/40">
                     <div className="flex items-center gap-2 min-w-0">
                       <span className="text-lg">⚠️</span>
-                      <span className="text-xs text-gray-700 truncate">
+                      <span className="text-xs text-sa-coffee truncate">
                         <span className="font-bold">{alertasStock.length}</span> insumos
                         con stock bajo
                       </span>
                     </div>
                     <Link
                       to="/inventario"
-                      className="text-xs font-medium text-yellow-700 hover:text-yellow-800 px-2 py-1 rounded-md hover:bg-yellow-100 shrink-0"
+                      className="text-xs font-mono font-medium text-sa-coffee hover:text-sa-green-ink px-2 py-1 rounded-md hover:bg-sa-banana/30 shrink-0"
                     >
                       Ver →
                     </Link>
                   </div>
                 )}
                 {lotesVencidos.length > 0 && (
-                  <div className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-red-50 border border-red-100">
+                  <div className="flex items-center justify-between px-3 py-2.5 rounded-sa bg-sa-strawberry/10 border border-sa-strawberry/30">
                     <div className="flex items-center gap-2 min-w-0">
                       <span className="text-lg">🔴</span>
-                      <span className="text-xs text-gray-700 truncate">
+                      <span className="text-xs text-sa-strawberry truncate">
                         <span className="font-bold">{lotesVencidos.length}</span> lotes
                         vencidos
                       </span>
                     </div>
                     <Link
                       to="/inventario"
-                      className="text-xs font-medium text-red-700 hover:text-red-800 px-2 py-1 rounded-md hover:bg-red-100 shrink-0"
+                      className="text-xs font-mono font-medium text-sa-strawberry hover:opacity-80 px-2 py-1 rounded-md hover:bg-sa-strawberry/15 shrink-0"
                     >
                       Ver →
                     </Link>
                   </div>
                 )}
                 {lotesPorVencer.length > 0 && (
-                  <div className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-orange-50 border border-orange-100">
+                  <div className="flex items-center justify-between px-3 py-2.5 rounded-sa bg-sa-mango/10 border border-sa-mango/30">
                     <div className="flex items-center gap-2 min-w-0">
                       <span className="text-lg">🟠</span>
-                      <span className="text-xs text-gray-700 truncate">
+                      <span className="text-xs text-sa-mango truncate">
                         <span className="font-bold">{lotesPorVencer.length}</span> lotes
                         por vencer
                       </span>
                     </div>
                     <Link
                       to="/inventario"
-                      className="text-xs font-medium text-orange-700 hover:text-orange-800 px-2 py-1 rounded-md hover:bg-orange-100 shrink-0"
+                      className="text-xs font-mono font-medium text-sa-mango hover:opacity-80 px-2 py-1 rounded-md hover:bg-sa-mango/15 shrink-0"
                     >
                       Ver →
                     </Link>
@@ -356,21 +357,21 @@ export function Dashboard() {
           </div>
 
           {/* D — Top 5 productos hoy */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Top 5 productos hoy</h3>
+          <div className="bg-white rounded-sa p-6 shadow-sa-sm border border-sa-green-ink/5">
+            <h3 className="text-xl font-display text-sa-green-ink mb-4">Top 5 productos hoy</h3>
             <ol className="space-y-2">
               {top5.map((p, i) => (
                 <li
                   key={p.producto_id}
-                  className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0"
+                  className="flex items-center justify-between py-2 border-b border-sa-green-ink/5 last:border-0"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <span className="w-6 h-6 flex items-center justify-center rounded-full bg-orange-100 text-orange-700 text-xs font-bold shrink-0">
+                    <span className="w-6 h-6 flex items-center justify-center rounded-full bg-sa-green text-sa-cream font-mono text-xs font-bold shrink-0">
                       {i + 1}
                     </span>
-                    <span className="text-sm text-gray-800 truncate">{p.nombre}</span>
+                    <span className="text-sm text-sa-green-ink truncate">{p.nombre}</span>
                   </div>
-                  <span className="text-sm font-bold text-gray-900 shrink-0 ml-2">
+                  <span className="text-sm font-mono font-semibold text-sa-green-ink shrink-0 ml-2">
                     {p.cantidad}
                   </span>
                 </li>
@@ -379,8 +380,8 @@ export function Dashboard() {
           </div>
 
           {/* E — Actividad reciente */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Actividad reciente</h3>
+          <div className="bg-white rounded-sa p-6 shadow-sa-sm border border-sa-green-ink/5">
+            <h3 className="text-xl font-display text-sa-green-ink mb-4">Actividad reciente</h3>
             <ul className="space-y-3">
               {ACTIVIDAD_DEMO.map((item) => (
                 <li key={item.id} className="flex items-start gap-3">
@@ -388,8 +389,8 @@ export function Dashboard() {
                     className={`w-2 h-2 rounded-full ${item.color} mt-1.5 shrink-0`}
                   ></span>
                   <div className="min-w-0">
-                    <p className="text-xs text-gray-400 font-medium">{item.tiempo}</p>
-                    <p className="text-sm text-gray-700">{item.accion}</p>
+                    <p className="text-xs text-sa-green-ink/50 font-mono">{item.tiempo}</p>
+                    <p className="text-sm text-sa-green-ink/80">{item.accion}</p>
                   </div>
                 </li>
               ))}

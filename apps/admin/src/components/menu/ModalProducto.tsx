@@ -91,38 +91,38 @@ export function ModalProducto({ open, onClose, onGuardar, producto, categorias }
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Nombre */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Nombre <span className="text-red-500">*</span>
+          <label className="block text-sm font-medium text-sa-green-ink/80 mb-1">
+            Nombre <span className="text-sa-strawberry">*</span>
           </label>
           <input
             type="text"
             value={form.nombre}
             onChange={(e) => set('nombre', e.target.value)}
             placeholder="Ej. Pechuga a la plancha"
-            className="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="w-full border border-sa-green-ink/15 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sa-green/40"
           />
-          {errores.nombre && <p className="text-red-500 text-xs mt-1">{errores.nombre}</p>}
+          {errores.nombre && <p className="text-sa-strawberry text-xs mt-1">{errores.nombre}</p>}
         </div>
 
         {/* Descripción */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+          <label className="block text-sm font-medium text-sa-green-ink/80 mb-1">Descripción</label>
           <textarea
             value={form.descripcion}
             onChange={(e) => set('descripcion', e.target.value)}
             placeholder="Ingredientes o descripción breve"
             rows={2}
-            className="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 resize-none"
+            className="w-full border border-sa-green-ink/15 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sa-green/40 resize-none"
           />
         </div>
 
         {/* Precio */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Precio (MXN) <span className="text-red-500">*</span>
+          <label className="block text-sm font-medium text-sa-green-ink/80 mb-1">
+            Precio (MXN) <span className="text-sa-strawberry">*</span>
           </label>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sa-green-ink/40 text-sm">$</span>
             <input
               type="number"
               min={0}
@@ -130,22 +130,22 @@ export function ModalProducto({ open, onClose, onGuardar, producto, categorias }
               value={form.precio || ''}
               onChange={(e) => set('precio', parseFloat(e.target.value) || 0)}
               placeholder="0.00"
-              className="w-full border border-gray-300 rounded-xl pl-7 pr-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="w-full border border-sa-green-ink/15 rounded-xl pl-7 pr-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sa-green/40"
             />
           </div>
-          {errores.precio && <p className="text-red-500 text-xs mt-1">{errores.precio}</p>}
+          {errores.precio && <p className="text-sa-strawberry text-xs mt-1">{errores.precio}</p>}
         </div>
 
         {/* Cocina (filtro) */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Cocina</label>
+          <label className="block text-sm font-medium text-sa-green-ink/80 mb-1">Cocina</label>
           <select
             value={filtroCocina}
             onChange={(e) => {
               setFiltroCocina(e.target.value)
               set('categoria_id', '')
             }}
-            className="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white"
+            className="w-full border border-sa-green-ink/15 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sa-green/40 bg-white"
           >
             <option value="">Todas las cocinas</option>
             {cocinaUnica.map((c) => (
@@ -158,13 +158,13 @@ export function ModalProducto({ open, onClose, onGuardar, producto, categorias }
 
         {/* Categoría */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Categoría <span className="text-red-500">*</span>
+          <label className="block text-sm font-medium text-sa-green-ink/80 mb-1">
+            Categoría <span className="text-sa-strawberry">*</span>
           </label>
           <select
             value={form.categoria_id}
             onChange={(e) => set('categoria_id', e.target.value)}
-            className="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white"
+            className="w-full border border-sa-green-ink/15 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sa-green/40 bg-white"
           >
             <option value="">Selecciona categoría</option>
             {categoriasFiltradas.map((c) => (
@@ -174,25 +174,25 @@ export function ModalProducto({ open, onClose, onGuardar, producto, categorias }
             ))}
           </select>
           {errores.categoria_id && (
-            <p className="text-red-500 text-xs mt-1">{errores.categoria_id}</p>
+            <p className="text-sa-strawberry text-xs mt-1">{errores.categoria_id}</p>
           )}
         </div>
 
         {/* Imagen URL */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">URL de imagen</label>
+          <label className="block text-sm font-medium text-sa-green-ink/80 mb-1">URL de imagen</label>
           <input
             type="url"
             value={form.imagen_url}
             onChange={(e) => set('imagen_url', e.target.value)}
             placeholder="https://..."
-            className="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="w-full border border-sa-green-ink/15 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sa-green/40"
           />
           {form.imagen_url && (
             <img
               src={form.imagen_url}
               alt="preview"
-              className="mt-2 h-20 w-20 object-cover rounded-xl border border-gray-200"
+              className="mt-2 h-20 w-20 object-cover rounded-xl border border-sa-green-ink/10"
               onError={(e) => (e.currentTarget.style.display = 'none')}
             />
           )}
@@ -203,7 +203,7 @@ export function ModalProducto({ open, onClose, onGuardar, producto, categorias }
           <div
             onClick={() => set('activo', !form.activo)}
             className={`relative w-11 h-6 rounded-full transition-colors ${
-              form.activo ? 'bg-orange-500' : 'bg-gray-300'
+              form.activo ? 'bg-sa-green' : 'bg-sa-green-ink/15'
             }`}
           >
             <span
@@ -212,7 +212,7 @@ export function ModalProducto({ open, onClose, onGuardar, producto, categorias }
               }`}
             />
           </div>
-          <span className="text-sm font-medium text-gray-700">Producto activo</span>
+          <span className="text-sm font-medium text-sa-green-ink/80">Producto activo</span>
         </label>
 
         {/* Acciones */}
@@ -220,14 +220,14 @@ export function ModalProducto({ open, onClose, onGuardar, producto, categorias }
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 border border-gray-300 text-gray-700 py-2.5 rounded-xl font-medium text-sm hover:bg-gray-50"
+            className="flex-1 border border-sa-green-ink/15 text-sa-green-ink/80 py-2.5 rounded-xl font-medium text-sm hover:bg-sa-cream-paper"
           >
             Cancelar
           </button>
           <button
             type="submit"
             disabled={guardando}
-            className="flex-1 bg-orange-500 disabled:opacity-50 text-white py-2.5 rounded-xl font-medium text-sm hover:bg-orange-600"
+            className="flex-1 bg-sa-green disabled:opacity-50 text-sa-cream py-2.5 rounded-xl font-medium text-sm hover:bg-sa-green-deep"
           >
             {guardando ? 'Guardando...' : producto ? 'Actualizar' : 'Crear producto'}
           </button>

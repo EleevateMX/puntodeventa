@@ -21,15 +21,16 @@ export function Modal({ open, onClose, title, children, width = 'max-w-lg' }: Mo
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        className="absolute inset-0 bg-sa-green-ink/50 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className={`relative bg-white rounded-2xl shadow-xl w-full ${width} max-h-[90vh] flex flex-col`}>
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+      <div className={`relative bg-sa-cream-soft rounded-sa-lg shadow-sa w-full ${width} max-h-[90vh] flex flex-col border border-sa-green-ink/5`}>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-sa-green-ink/10">
+          <h3 className="text-2xl font-display text-sa-green-ink">{title}</h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors text-xl leading-none"
+            className="text-sa-green-ink/50 hover:text-sa-green-ink transition-colors text-xl leading-none"
+            aria-label="Cerrar"
           >
             ✕
           </button>

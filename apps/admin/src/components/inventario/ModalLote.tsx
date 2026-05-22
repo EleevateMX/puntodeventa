@@ -63,52 +63,52 @@ export function ModalLote({ open, onClose, onGuardar, insumos, almacenes }: Prop
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Insumo *</label>
-            <select value={form.insumo_id} onChange={(e) => set('insumo_id', e.target.value)} className="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white">
+            <label className="block text-sm font-medium text-sa-green-ink/80 mb-1">Insumo *</label>
+            <select value={form.insumo_id} onChange={(e) => set('insumo_id', e.target.value)} className="w-full border border-sa-green-ink/15 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sa-green/40 bg-white">
               <option value="">Selecciona</option>
               {insumos.map((i) => <option key={i.id} value={i.id}>{i.nombre}</option>)}
             </select>
-            {errores.insumo_id && <p className="text-red-500 text-xs mt-1">{errores.insumo_id}</p>}
+            {errores.insumo_id && <p className="text-sa-strawberry text-xs mt-1">{errores.insumo_id}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Almacén *</label>
-            <select value={form.almacen_id} onChange={(e) => set('almacen_id', e.target.value)} className="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white">
+            <label className="block text-sm font-medium text-sa-green-ink/80 mb-1">Almacén *</label>
+            <select value={form.almacen_id} onChange={(e) => set('almacen_id', e.target.value)} className="w-full border border-sa-green-ink/15 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sa-green/40 bg-white">
               <option value="">Selecciona</option>
               {almacenes.map((a) => <option key={a.id} value={a.id}>{a.nombre}</option>)}
             </select>
-            {errores.almacen_id && <p className="text-red-500 text-xs mt-1">{errores.almacen_id}</p>}
+            {errores.almacen_id && <p className="text-sa-strawberry text-xs mt-1">{errores.almacen_id}</p>}
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Número de lote</label>
-            <input type="text" value={form.numero_lote} onChange={(e) => set('numero_lote', e.target.value)} placeholder="Ej. L-2024-001" className="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400" />
+            <label className="block text-sm font-medium text-sa-green-ink/80 mb-1">Número de lote</label>
+            <input type="text" value={form.numero_lote} onChange={(e) => set('numero_lote', e.target.value)} placeholder="Ej. L-2024-001" className="w-full border border-sa-green-ink/15 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sa-green/40" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Fecha vencimiento</label>
-            <input type="date" value={form.fecha_vencimiento} onChange={(e) => set('fecha_vencimiento', e.target.value)} className="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400" />
+            <label className="block text-sm font-medium text-sa-green-ink/80 mb-1">Fecha vencimiento</label>
+            <input type="date" value={form.fecha_vencimiento} onChange={(e) => set('fecha_vencimiento', e.target.value)} className="w-full border border-sa-green-ink/15 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sa-green/40" />
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Cantidad *</label>
-            <input type="number" min={0} step={0.1} value={form.cantidad_inicial || ''} onChange={(e) => { const v = parseFloat(e.target.value) || 0; setForm((f) => ({ ...f, cantidad_inicial: v, cantidad_actual: v })) }} placeholder="0" className="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400" />
-            {errores.cantidad_inicial && <p className="text-red-500 text-xs mt-1">{errores.cantidad_inicial}</p>}
+            <label className="block text-sm font-medium text-sa-green-ink/80 mb-1">Cantidad *</label>
+            <input type="number" min={0} step={0.1} value={form.cantidad_inicial || ''} onChange={(e) => { const v = parseFloat(e.target.value) || 0; setForm((f) => ({ ...f, cantidad_inicial: v, cantidad_actual: v })) }} placeholder="0" className="w-full border border-sa-green-ink/15 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sa-green/40" />
+            {errores.cantidad_inicial && <p className="text-sa-strawberry text-xs mt-1">{errores.cantidad_inicial}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Costo unitario</label>
+            <label className="block text-sm font-medium text-sa-green-ink/80 mb-1">Costo unitario</label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
-              <input type="number" min={0} step={0.01} value={form.costo_unitario || ''} onChange={(e) => set('costo_unitario', parseFloat(e.target.value) || 0)} placeholder="0.00" className="w-full border border-gray-300 rounded-xl pl-7 pr-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400" />
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sa-green-ink/40 text-sm">$</span>
+              <input type="number" min={0} step={0.01} value={form.costo_unitario || ''} onChange={(e) => set('costo_unitario', parseFloat(e.target.value) || 0)} placeholder="0.00" className="w-full border border-sa-green-ink/15 rounded-xl pl-7 pr-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sa-green/40" />
             </div>
           </div>
         </div>
 
         <div className="flex gap-3 pt-2">
-          <button type="button" onClick={onClose} className="flex-1 border border-gray-300 text-gray-700 py-2.5 rounded-xl font-medium text-sm hover:bg-gray-50">Cancelar</button>
-          <button type="submit" className="flex-1 bg-orange-500 text-white py-2.5 rounded-xl font-medium text-sm hover:bg-orange-600">Registrar lote</button>
+          <button type="button" onClick={onClose} className="flex-1 border border-sa-green-ink/15 text-sa-green-ink/80 py-2.5 rounded-xl font-medium text-sm hover:bg-sa-cream-paper">Cancelar</button>
+          <button type="submit" className="flex-1 bg-sa-green text-sa-cream py-2.5 rounded-xl font-medium text-sm hover:bg-sa-green-deep">Registrar lote</button>
         </div>
       </form>
     </Modal>

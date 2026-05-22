@@ -2,10 +2,10 @@ import React from 'react'
 import type { Transferencia, Insumo, Almacen } from '../../hooks/useInventario'
 
 const ESTADO_CONFIG: Record<Transferencia['estado'], { label: string; clase: string }> = {
-  pendiente: { label: 'Pendiente', clase: 'bg-yellow-100 text-yellow-700' },
-  enviada:   { label: 'Enviada',   clase: 'bg-blue-100 text-blue-700' },
-  recibida:  { label: 'Recibida',  clase: 'bg-green-100 text-green-700' },
-  cancelada: { label: 'Cancelada', clase: 'bg-gray-100 text-gray-500' },
+  pendiente: { label: 'Pendiente', clase: 'bg-sa-banana/30 text-sa-coffee' },
+  enviada:   { label: 'Enviada',   clase: 'bg-sa-blueberry/15 text-sa-blueberry' },
+  recibida:  { label: 'Recibida',  clase: 'bg-sa-mint/30 text-sa-green-deep' },
+  cancelada: { label: 'Cancelada', clase: 'bg-sa-cream-warm text-sa-green-ink/60' },
 }
 
 interface Props {
@@ -28,15 +28,15 @@ export function TablaTransferencias({ transferencias, insumos, almacenes, onCamb
       {transferencias.map((t) => {
         const cfg = ESTADO_CONFIG[t.estado]
         return (
-          <div key={t.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+          <div key={t.id} className="bg-white rounded-sa shadow-sa-sm border border-sa-green-ink/5 p-5">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-3 mb-2">
-                  <span className="font-semibold text-gray-900 text-sm">
+                  <span className="font-semibold text-sa-green-ink text-sm">
                     {getNombreAlmacen(t.origen_id)}
                   </span>
-                  <span className="text-gray-400">→</span>
-                  <span className="font-semibold text-gray-900 text-sm">
+                  <span className="text-sa-green-ink/40">→</span>
+                  <span className="font-semibold text-sa-green-ink text-sm">
                     {getNombreAlmacen(t.destino_id)}
                   </span>
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${cfg.clase}`}>
@@ -45,13 +45,13 @@ export function TablaTransferencias({ transferencias, insumos, almacenes, onCamb
                 </div>
                 <div className="flex flex-wrap gap-2 mb-2">
                   {t.items.map((item, idx) => (
-                    <span key={idx} className="inline-flex items-center gap-1 px-2.5 py-1 bg-gray-50 rounded-lg text-xs text-gray-700 border border-gray-100">
+                    <span key={idx} className="inline-flex items-center gap-1 px-2.5 py-1 bg-sa-cream-paper rounded-lg text-xs text-sa-green-ink/80 border border-sa-green-ink/5">
                       <span className="font-medium">{getNombreInsumo(item.insumo_id)}</span>
-                      <span className="text-gray-400">×{item.cantidad}</span>
+                      <span className="text-sa-green-ink/40">×{item.cantidad}</span>
                     </span>
                   ))}
                 </div>
-                <div className="flex items-center gap-3 text-xs text-gray-400">
+                <div className="flex items-center gap-3 text-xs text-sa-green-ink/40">
                   <span>{new Date(t.created_at).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
                   {t.notas && <span>· {t.notas}</span>}
                 </div>
@@ -63,13 +63,13 @@ export function TablaTransferencias({ transferencias, insumos, almacenes, onCamb
                   <>
                     <button
                       onClick={() => onCambiarEstado(t.id, 'enviada')}
-                      className="px-3 py-1.5 text-xs font-medium bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 text-blue-600"
+                      className="px-3 py-1.5 text-xs font-medium bg-sa-blueberry/10 border border-sa-blueberry/30 rounded-lg hover:bg-sa-blueberry/15 text-sa-blueberry"
                     >
                       Marcar enviada
                     </button>
                     <button
                       onClick={() => onCambiarEstado(t.id, 'cancelada')}
-                      className="px-3 py-1.5 text-xs font-medium border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-500"
+                      className="px-3 py-1.5 text-xs font-medium border border-sa-green-ink/10 rounded-lg hover:bg-sa-cream-paper text-sa-green-ink/60"
                     >
                       Cancelar
                     </button>
@@ -78,7 +78,7 @@ export function TablaTransferencias({ transferencias, insumos, almacenes, onCamb
                 {t.estado === 'enviada' && (
                   <button
                     onClick={() => onCambiarEstado(t.id, 'recibida')}
-                    className="px-3 py-1.5 text-xs font-medium bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 text-green-600"
+                    className="px-3 py-1.5 text-xs font-medium bg-sa-mint/15 border border-sa-mint/40 rounded-lg hover:bg-sa-mint/30 text-sa-green-deep"
                   >
                     Confirmar recepción
                   </button>
@@ -89,7 +89,7 @@ export function TablaTransferencias({ transferencias, insumos, almacenes, onCamb
         )
       })}
       {transferencias.length === 0 && (
-        <div className="text-center py-12 text-gray-400 bg-white rounded-2xl border border-gray-100">
+        <div className="text-center py-12 text-sa-green-ink/40 bg-white rounded-sa border border-sa-green-ink/5">
           Sin transferencias registradas
         </div>
       )}

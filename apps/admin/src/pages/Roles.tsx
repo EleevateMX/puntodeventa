@@ -53,19 +53,19 @@ const ROL_EMOJI: Record<Rol, string> = {
 }
 
 const ROL_DOT: Record<Rol, string> = {
-  admin:      'bg-purple-500',
-  cajero:     'bg-blue-500',
-  cocinero:   'bg-orange-500',
-  mesero:     'bg-teal-500',
-  supervisor: 'bg-indigo-500',
+  admin:      'bg-sa-blueberry',
+  cajero:     'bg-sa-mint',
+  cocinero:   'bg-sa-mango',
+  mesero:     'bg-sa-banana',
+  supervisor: 'bg-sa-green',
 }
 
 const ROL_COLOR: Record<Rol, string> = {
-  admin:      'bg-purple-100 text-purple-700',
-  cajero:     'bg-blue-100 text-blue-700',
-  cocinero:   'bg-orange-100 text-orange-700',
-  mesero:     'bg-teal-100 text-teal-700',
-  supervisor: 'bg-indigo-100 text-indigo-700',
+  admin:      'bg-sa-blueberry/15 text-sa-blueberry',
+  cajero:     'bg-sa-mint/30 text-sa-green-ink',
+  cocinero:   'bg-sa-mango/15 text-sa-mango',
+  mesero:     'bg-sa-banana/30 text-sa-coffee',
+  supervisor: 'bg-sa-green/15 text-sa-green-deep',
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -119,14 +119,14 @@ export function Roles() {
   }
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen bg-sa-cream-paper">
       {/* Header */}
-      <div className="px-8 pt-8 pb-6 bg-gray-50 border-b border-gray-200">
+      <div className="px-8 pt-8 pb-6 bg-sa-cream-paper border-b border-sa-green-ink/10">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-gray-900">Empleados y Roles</h2>
+          <h2 className="text-3xl font-display text-sa-green-ink">Empleados y Roles</h2>
           <button
             onClick={abrirNuevo}
-            className="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded-xl font-medium text-sm transition-colors"
+            className="bg-sa-green hover:bg-sa-green-deep text-sa-cream px-5 py-2.5 rounded-sa font-medium text-sm transition-colors"
           >
             + Nuevo empleado
           </button>
@@ -135,22 +135,22 @@ export function Roles() {
         {/* Stat cards */}
         <div className="grid grid-cols-4 gap-4 mt-6">
           {/* Total */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
-            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Total empleados</p>
-            <p className="text-3xl font-bold text-gray-900 mt-1">{empleados.length}</p>
+          <div className="bg-white rounded-sa border border-sa-green-ink/5 shadow-sa-sm p-4">
+            <p className="text-xs font-mono text-sa-green-ink/60 uppercase tracking-wide">Total empleados</p>
+            <p className="text-4xl font-display text-sa-green-ink mt-1 leading-none">{empleados.length}</p>
           </div>
 
           {/* Activos */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
-            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Activos</p>
-            <p className="text-3xl font-bold text-green-600 mt-1">{totalActivos}</p>
-            <p className="text-xs text-gray-400 mt-0.5">{empleados.length - totalActivos} inactivos</p>
+          <div className="bg-white rounded-sa border border-sa-green-ink/5 shadow-sa-sm p-4">
+            <p className="text-xs font-mono text-sa-green-ink/60 uppercase tracking-wide">Activos</p>
+            <p className="text-4xl font-display text-sa-green mt-1 leading-none">{totalActivos}</p>
+            <p className="text-xs font-mono text-sa-green-ink/50 mt-1">{empleados.length - totalActivos} inactivos</p>
           </div>
 
           {/* Rol más común */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
-            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Rol más común</p>
-            <div className="flex items-center gap-2 mt-1">
+          <div className="bg-white rounded-sa border border-sa-green-ink/5 shadow-sa-sm p-4">
+            <p className="text-xs font-mono text-sa-green-ink/60 uppercase tracking-wide">Rol más común</p>
+            <div className="flex items-center gap-2 mt-2">
               <span className="text-2xl">{ROL_EMOJI[rolMasComun]}</span>
               <span className={`px-2.5 py-1 rounded-full text-sm font-semibold ${ROL_COLOR[rolMasComun]}`}>
                 {ROL_LABEL[rolMasComun]}
@@ -159,14 +159,14 @@ export function Roles() {
           </div>
 
           {/* Roles breakdown */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
-            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Roles</p>
+          <div className="bg-white rounded-sa border border-sa-green-ink/5 shadow-sa-sm p-4">
+            <p className="text-xs font-mono text-sa-green-ink/60 uppercase tracking-wide mb-2">Roles</p>
             <div className="space-y-1">
               {ROLES_TABLA.filter((r) => conteoRol[r] > 0).map((rol) => (
                 <div key={rol} className="flex items-center gap-2">
                   <span className={`w-2 h-2 rounded-full flex-shrink-0 ${ROL_DOT[rol]}`} />
-                  <span className="text-xs text-gray-600 flex-1">{ROL_LABEL[rol]}</span>
-                  <span className="text-xs font-semibold text-gray-800">{conteoRol[rol]}</span>
+                  <span className="text-xs text-sa-green-ink/70 flex-1">{ROL_LABEL[rol]}</span>
+                  <span className="text-xs font-mono font-semibold text-sa-green-ink">{conteoRol[rol]}</span>
                 </div>
               ))}
             </div>
@@ -185,11 +185,11 @@ export function Roles() {
 
         {/* Permisos por rol */}
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Permisos por rol</h3>
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <h3 className="text-2xl font-display text-sa-green-ink mb-4">Permisos por rol</h3>
+          <div className="bg-white rounded-sa shadow-sa-sm border border-sa-green-ink/5 overflow-hidden">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-100 text-left text-gray-500 text-xs uppercase tracking-wide">
+                <tr className="bg-sa-cream-soft border-b border-sa-green-ink/10 text-left text-sa-green-ink/60 font-mono text-xs uppercase tracking-wide">
                   <th className="px-5 py-3 font-medium w-48">Acción</th>
                   {ROLES_TABLA.map((rol) => (
                     <th key={rol} className="px-5 py-3 font-medium text-center">
@@ -201,20 +201,20 @@ export function Roles() {
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-sa-green-ink/5">
                 {ACCIONES.map((accion) => (
-                  <tr key={accion} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-5 py-3 font-medium text-gray-700">{accion}</td>
+                  <tr key={accion} className="hover:bg-sa-cream-soft/50 transition-colors">
+                    <td className="px-5 py-3 font-medium text-sa-green-ink/80">{accion}</td>
                     {ROLES_TABLA.map((rol) => {
                       const tiene = PERMISOS[accion][rol]
                       return (
                         <td key={rol} className="px-5 py-3 text-center">
                           {tiene ? (
-                            <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-100 text-green-600 font-bold text-xs">
+                            <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-sa-mint/30 text-sa-green-deep font-bold text-xs">
                               ✓
                             </span>
                           ) : (
-                            <span className="text-gray-300 font-medium">—</span>
+                            <span className="text-sa-green-ink/25 font-medium">—</span>
                           )}
                         </td>
                       )
@@ -241,25 +241,25 @@ export function Roles() {
       {/* Diálogo de confirmación de eliminación */}
       {confirmEliminar && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setConfirmEliminar(null)} />
-          <div className="relative bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">¿Eliminar empleado?</h3>
-            <p className="text-gray-500 text-sm mb-5">
+          <div className="absolute inset-0 bg-sa-green-ink/50 backdrop-blur-sm" onClick={() => setConfirmEliminar(null)} />
+          <div className="relative bg-sa-cream-soft rounded-sa-lg shadow-sa p-6 w-full max-w-sm border border-sa-green-ink/5">
+            <h3 className="text-2xl font-display text-sa-green-ink mb-2">¿Eliminar empleado?</h3>
+            <p className="text-sa-green-ink/70 text-sm mb-5">
               Se eliminará a{' '}
-              <span className="font-medium text-gray-700">"{confirmEliminar.nombre}"</span>{' '}
+              <span className="font-medium text-sa-green-ink">"{confirmEliminar.nombre}"</span>{' '}
               permanentemente. Esta acción no se puede deshacer.
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setConfirmEliminar(null)}
-                className="flex-1 border border-gray-300 text-gray-700 py-2.5 rounded-xl font-medium text-sm hover:bg-gray-50"
+                className="flex-1 border border-sa-green-ink/15 text-sa-green-ink py-2.5 rounded-sa font-medium text-sm hover:bg-sa-cream-warm/50"
               >
                 Cancelar
               </button>
               <button
                 onClick={confirmarEliminar}
                 disabled={eliminando}
-                className="flex-1 bg-red-500 disabled:opacity-50 text-white py-2.5 rounded-xl font-medium text-sm hover:bg-red-600"
+                className="flex-1 bg-sa-strawberry disabled:opacity-50 text-white py-2.5 rounded-sa font-medium text-sm hover:opacity-90"
               >
                 {eliminando ? 'Eliminando...' : 'Eliminar'}
               </button>

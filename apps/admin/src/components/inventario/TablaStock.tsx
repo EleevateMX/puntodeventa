@@ -36,40 +36,40 @@ export function TablaStock({ insumos, stock, almacenes, onAjustar }: Props) {
       <div className="flex items-center gap-3 mb-4">
         <button
           onClick={() => setFiltroAlerta(false)}
-          className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${!filtroAlerta ? 'bg-gray-900 text-white' : 'bg-white text-gray-600 border border-gray-200'}`}
+          className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${!filtroAlerta ? 'bg-sa-green-ink text-white' : 'bg-white text-sa-green-ink/70 border border-sa-green-ink/10'}`}
         >
           Todos
         </button>
         <button
           onClick={() => setFiltroAlerta(true)}
-          className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors flex items-center gap-1.5 ${filtroAlerta ? 'bg-yellow-500 text-white' : 'bg-white text-gray-600 border border-gray-200'}`}
+          className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors flex items-center gap-1.5 ${filtroAlerta ? 'bg-sa-banana text-white' : 'bg-white text-sa-green-ink/70 border border-sa-green-ink/10'}`}
         >
           ⚠ Solo alertas
-          <span className={`text-xs px-1.5 py-0.5 rounded-full ${filtroAlerta ? 'bg-yellow-600 text-white' : 'bg-yellow-100 text-yellow-700'}`}>
+          <span className={`text-xs px-1.5 py-0.5 rounded-full ${filtroAlerta ? 'bg-sa-coffee text-sa-cream' : 'bg-sa-banana/30 text-sa-coffee'}`}>
             {stock.filter((s) => s.stock_actual <= s.stock_minimo).length}
           </span>
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-sa shadow-sa-sm border border-sa-green-ink/5 overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-gray-100 text-left text-xs text-gray-500 uppercase tracking-wide">
+            <tr className="border-b border-sa-green-ink/5 text-left text-xs text-sa-green-ink/60 uppercase tracking-wide">
               <th className="px-5 py-3 font-medium">Insumo</th>
               <th className="px-5 py-3 font-medium">Unidad</th>
               {almacenes.map((a) => (
                 <th key={a.id} className="px-5 py-3 font-medium text-center">
                   <div>{a.nombre}</div>
-                  <div className="text-gray-400 normal-case font-normal capitalize">{a.tipo}</div>
+                  <div className="text-sa-green-ink/40 normal-case font-normal capitalize">{a.tipo}</div>
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-50">
+          <tbody className="divide-y divide-sa-green-ink/5">
             {insumosFiltrados.map((insumo) => (
-              <tr key={insumo.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-5 py-3 font-medium text-gray-900">{insumo.nombre}</td>
-                <td className="px-5 py-3 text-gray-500 text-xs">{insumo.unidad}</td>
+              <tr key={insumo.id} className="hover:bg-sa-cream-paper transition-colors">
+                <td className="px-5 py-3 font-medium text-sa-green-ink">{insumo.nombre}</td>
+                <td className="px-5 py-3 text-sa-green-ink/60 text-xs">{insumo.unidad}</td>
                 {almacenes.map((a) => {
                   const s = getStock(insumo.id, a.id)
                   const isEditing = editando?.insumoId === insumo.id && editando?.almacenId === a.id
@@ -85,27 +85,27 @@ export function TablaStock({ insumos, stock, almacenes, onAjustar }: Props) {
                             value={editando.valor}
                             onChange={(e) => setEditando((prev) => prev ? { ...prev, valor: e.target.value } : null)}
                             onKeyDown={(e) => { if (e.key === 'Enter') confirmarAjuste(); if (e.key === 'Escape') setEditando(null) }}
-                            className="w-20 border border-orange-400 rounded-lg px-2 py-1 text-center text-sm focus:outline-none"
+                            className="w-20 border border-sa-green rounded-lg px-2 py-1 text-center text-sm focus:outline-none"
                             autoFocus
                           />
-                          <button onClick={confirmarAjuste} className="text-green-500 hover:text-green-700 text-lg">✓</button>
-                          <button onClick={() => setEditando(null)} className="text-gray-400 hover:text-gray-600">✕</button>
+                          <button onClick={confirmarAjuste} className="text-sa-mint hover:text-sa-green-deep text-lg">✓</button>
+                          <button onClick={() => setEditando(null)} className="text-sa-green-ink/40 hover:text-sa-green-ink/70">✕</button>
                         </div>
                       ) : (
                         <button
                           onClick={() => s && setEditando({ insumoId: insumo.id, almacenId: a.id, valor: String(s.stock_actual) })}
-                          className={`group relative inline-flex flex-col items-center px-3 py-1.5 rounded-xl hover:bg-orange-50 transition-colors ${alerta ? 'bg-red-50' : ''}`}
+                          className={`group relative inline-flex flex-col items-center px-3 py-1.5 rounded-xl hover:bg-sa-cream-soft transition-colors ${alerta ? 'bg-sa-strawberry/10' : ''}`}
                         >
                           {s ? (
                             <>
-                              <span className={`font-bold text-base ${alerta ? 'text-red-600' : 'text-gray-900'}`}>
+                              <span className={`font-bold text-base ${alerta ? 'text-sa-strawberry' : 'text-sa-green-ink'}`}>
                                 {s.stock_actual.toFixed(1)}
                               </span>
-                              <span className="text-gray-400 text-xs">mín {s.stock_minimo}</span>
-                              {alerta && <span className="text-yellow-500 text-xs">⚠</span>}
+                              <span className="text-sa-green-ink/40 text-xs">mín {s.stock_minimo}</span>
+                              {alerta && <span className="text-sa-coffee text-xs">⚠</span>}
                             </>
                           ) : (
-                            <span className="text-gray-300">—</span>
+                            <span className="text-sa-green-ink/25">—</span>
                           )}
                         </button>
                       )}
@@ -117,7 +117,7 @@ export function TablaStock({ insumos, stock, almacenes, onAjustar }: Props) {
           </tbody>
         </table>
       </div>
-      <p className="text-xs text-gray-400 mt-2">Haz clic en cualquier cantidad para editarla directamente.</p>
+      <p className="text-xs text-sa-green-ink/40 mt-2">Haz clic en cualquier cantidad para editarla directamente.</p>
     </div>
   )
 }

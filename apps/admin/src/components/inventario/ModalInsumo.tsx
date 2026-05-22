@@ -42,21 +42,21 @@ export function ModalInsumo({ open, onClose, insumo, onGuardar }: Props) {
     <Modal open={open} onClose={onClose} title={insumo ? 'Editar insumo' : 'Nuevo insumo'}>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Nombre <span className="text-red-500">*</span>
+          <label className="block text-sm font-medium text-sa-green-ink/80 mb-1">
+            Nombre <span className="text-sa-strawberry">*</span>
           </label>
           <input
             type="text"
             value={form.nombre}
             onChange={(e) => setForm((f) => ({ ...f, nombre: e.target.value }))}
             placeholder="Ej. Pollo"
-            className="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="w-full border border-sa-green-ink/15 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sa-green/40"
           />
-          {errores.nombre && <p className="text-red-500 text-xs mt-1">{errores.nombre}</p>}
+          {errores.nombre && <p className="text-sa-strawberry text-xs mt-1">{errores.nombre}</p>}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Unidad de medida</label>
+          <label className="block text-sm font-medium text-sa-green-ink/80 mb-1">Unidad de medida</label>
           <div className="flex flex-wrap gap-2">
             {UNIDADES.map((u) => (
               <button
@@ -65,8 +65,8 @@ export function ModalInsumo({ open, onClose, insumo, onGuardar }: Props) {
                 onClick={() => setForm((f) => ({ ...f, unidad: u }))}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
                   form.unidad === u
-                    ? 'border-orange-500 bg-orange-50 text-orange-600'
-                    : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                    ? 'border-sa-green bg-sa-cream-soft text-sa-green-deep'
+                    : 'border-sa-green-ink/10 text-sa-green-ink/70 hover:border-sa-green-ink/15'
                 }`}
               >
                 {u}
@@ -76,9 +76,9 @@ export function ModalInsumo({ open, onClose, insumo, onGuardar }: Props) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Costo unitario (MXN)</label>
+          <label className="block text-sm font-medium text-sa-green-ink/80 mb-1">Costo unitario (MXN)</label>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sa-green-ink/40 text-sm">$</span>
             <input
               type="number"
               min={0}
@@ -86,17 +86,17 @@ export function ModalInsumo({ open, onClose, insumo, onGuardar }: Props) {
               value={form.costo_unitario || ''}
               onChange={(e) => setForm((f) => ({ ...f, costo_unitario: parseFloat(e.target.value) || 0 }))}
               placeholder="0.00"
-              className="w-full border border-gray-300 rounded-xl pl-7 pr-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="w-full border border-sa-green-ink/15 rounded-xl pl-7 pr-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sa-green/40"
             />
           </div>
-          {errores.costo_unitario && <p className="text-red-500 text-xs mt-1">{errores.costo_unitario}</p>}
+          {errores.costo_unitario && <p className="text-sa-strawberry text-xs mt-1">{errores.costo_unitario}</p>}
         </div>
 
         <div className="flex gap-3 pt-2">
-          <button type="button" onClick={onClose} className="flex-1 border border-gray-300 text-gray-700 py-2.5 rounded-xl font-medium text-sm hover:bg-gray-50">
+          <button type="button" onClick={onClose} className="flex-1 border border-sa-green-ink/15 text-sa-green-ink/80 py-2.5 rounded-xl font-medium text-sm hover:bg-sa-cream-paper">
             Cancelar
           </button>
-          <button type="submit" className="flex-1 bg-orange-500 text-white py-2.5 rounded-xl font-medium text-sm hover:bg-orange-600">
+          <button type="submit" className="flex-1 bg-sa-green text-sa-cream py-2.5 rounded-xl font-medium text-sm hover:bg-sa-green-deep">
             {insumo ? 'Actualizar' : 'Crear insumo'}
           </button>
         </div>

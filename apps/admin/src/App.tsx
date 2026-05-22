@@ -16,34 +16,44 @@ const navItems = [
 
 export default function App() {
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-sa-cream-paper">
       {/* Sidebar */}
-      <aside className="w-60 bg-gray-900 text-white flex flex-col">
-        <div className="p-6 border-b border-gray-700">
-          <h1 className="text-xl font-bold text-orange-400">POS Admin</h1>
+      <aside className="w-64 bg-sa-green-deep text-sa-cream flex flex-col">
+        <div className="px-6 pt-7 pb-6">
+          <img
+            src="/logo.png"
+            alt="Shake Aholic"
+            className="w-[140px] h-auto select-none"
+            draggable={false}
+          />
         </div>
-        <nav className="flex-1 p-4 space-y-1">
+        <nav className="flex-1 px-3 space-y-1">
           {navItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-colors ${
+                `flex items-center gap-3 px-4 py-3 rounded-sa-lg text-sm transition-colors ${
                   isActive
-                    ? 'bg-orange-500 text-white'
-                    : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                    ? 'bg-sa-cream text-sa-green-ink font-semibold shadow-sa-sm'
+                    : 'text-sa-cream/80 hover:text-sa-cream hover:bg-white/5 font-medium'
                 }`
               }
             >
-              <span>{item.icon}</span>
+              <span className="text-base">{item.icon}</span>
               {item.label}
             </NavLink>
           ))}
         </nav>
+        <div className="px-6 py-5 border-t border-sa-cream/10">
+          <p className="text-[11px] font-mono uppercase tracking-wider text-sa-cream/60">
+            Shake Aholic · Admin
+          </p>
+        </div>
       </aside>
 
       {/* Content */}
-      <main className="flex-1">
+      <main className="flex-1 min-w-0 bg-sa-cream-paper">
         <Routes>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<Dashboard />} />

@@ -37,9 +37,9 @@ export function TablaInsumos({ insumos, stock, almacenes, onEditar, onEliminar }
   }
 
   const ESTADO_BADGE: Record<string, string> = {
-    ok: 'bg-green-100 text-green-700',
-    alerta: 'bg-yellow-100 text-yellow-700',
-    agotado: 'bg-red-100 text-red-700',
+    ok: 'bg-sa-mint/30 text-sa-green-deep',
+    alerta: 'bg-sa-banana/30 text-sa-coffee',
+    agotado: 'bg-sa-strawberry/15 text-sa-strawberry',
   }
   const ESTADO_LABEL: Record<string, string> = {
     ok: '● OK',
@@ -51,21 +51,21 @@ export function TablaInsumos({ insumos, stock, almacenes, onEditar, onEliminar }
     <div>
       <div className="mb-4">
         <div className="relative w-64">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">🔍</span>
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sa-green-ink/40 text-sm">🔍</span>
           <input
             type="text"
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
             placeholder="Buscar insumo..."
-            className="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white"
+            className="w-full pl-8 pr-4 py-2 border border-sa-green-ink/10 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sa-green/40 bg-white"
           />
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-sa shadow-sa-sm border border-sa-green-ink/5 overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-gray-100 text-left text-xs text-gray-500 uppercase tracking-wide">
+            <tr className="border-b border-sa-green-ink/5 text-left text-xs text-sa-green-ink/60 uppercase tracking-wide">
               <th className="px-5 py-3 font-medium">Insumo</th>
               <th className="px-5 py-3 font-medium">Unidad</th>
               <th className="px-5 py-3 font-medium">Costo unitario</th>
@@ -76,26 +76,26 @@ export function TablaInsumos({ insumos, stock, almacenes, onEditar, onEliminar }
               <th className="px-5 py-3 font-medium text-right">Acciones</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-50">
+          <tbody className="divide-y divide-sa-green-ink/5">
             {filtrados.map((insumo) => {
               const estado = estadoStock(insumo.id)
               return (
-                <tr key={insumo.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-5 py-3 font-medium text-gray-900">{insumo.nombre}</td>
-                  <td className="px-5 py-3 text-gray-500">{insumo.unidad}</td>
-                  <td className="px-5 py-3 text-gray-700">${insumo.costo_unitario.toFixed(2)}</td>
+                <tr key={insumo.id} className="hover:bg-sa-cream-paper transition-colors">
+                  <td className="px-5 py-3 font-medium text-sa-green-ink">{insumo.nombre}</td>
+                  <td className="px-5 py-3 text-sa-green-ink/60">{insumo.unidad}</td>
+                  <td className="px-5 py-3 text-sa-green-ink/80">${insumo.costo_unitario.toFixed(2)}</td>
                   {almacenes.map((a) => {
                     const s = stock.find((x) => x.insumo_id === insumo.id && x.almacen_id === a.id)
                     const bajo = s && s.stock_actual <= s.stock_minimo
                     return (
                       <td key={a.id} className="px-5 py-3 text-center">
                         {s ? (
-                          <span className={`font-semibold ${bajo ? 'text-red-600' : 'text-gray-900'}`}>
+                          <span className={`font-semibold ${bajo ? 'text-sa-strawberry' : 'text-sa-green-ink'}`}>
                             {s.stock_actual.toFixed(1)}
-                            <span className="text-gray-400 text-xs ml-1">/{s.stock_minimo}</span>
+                            <span className="text-sa-green-ink/40 text-xs ml-1">/{s.stock_minimo}</span>
                           </span>
                         ) : (
-                          <span className="text-gray-300">—</span>
+                          <span className="text-sa-green-ink/25">—</span>
                         )}
                       </td>
                     )
@@ -109,13 +109,13 @@ export function TablaInsumos({ insumos, stock, almacenes, onEditar, onEliminar }
                     <div className="flex items-center justify-end gap-2">
                       <button
                         onClick={() => onEditar(insumo)}
-                        className="px-3 py-1.5 text-xs font-medium border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-600"
+                        className="px-3 py-1.5 text-xs font-medium border border-sa-green-ink/10 rounded-lg hover:bg-sa-cream-paper text-sa-green-ink/70"
                       >
                         Editar
                       </button>
                       <button
                         onClick={() => onEliminar(insumo)}
-                        className="px-3 py-1.5 text-xs font-medium border border-red-200 rounded-lg hover:bg-red-50 text-red-600"
+                        className="px-3 py-1.5 text-xs font-medium border border-sa-strawberry/30 rounded-lg hover:bg-sa-strawberry/10 text-sa-strawberry"
                       >
                         Eliminar
                       </button>
@@ -127,7 +127,7 @@ export function TablaInsumos({ insumos, stock, almacenes, onEditar, onEliminar }
           </tbody>
         </table>
         {filtrados.length === 0 && (
-          <div className="text-center py-12 text-gray-400">
+          <div className="text-center py-12 text-sa-green-ink/40">
             <p>Sin resultados</p>
           </div>
         )}

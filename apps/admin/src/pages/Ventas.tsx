@@ -108,7 +108,7 @@ function BarChart({ data }: BarChartProps) {
               x2={PADDING_LEFT + chartW}
               y1={t.y}
               y2={t.y}
-              stroke="#f3f4f6"
+              stroke="rgba(20,36,29,0.08)"
               strokeWidth={1}
             />
             <text
@@ -116,7 +116,8 @@ function BarChart({ data }: BarChartProps) {
               y={t.y + 4}
               textAnchor="end"
               fontSize={10}
-              fill="#9ca3af"
+              fill="rgba(20,36,29,0.5)"
+              fontFamily="DM Mono, monospace"
             >
               {t.val >= 1000 ? `$${t.val / 1000}k` : `$${t.val}`}
             </text>
@@ -137,9 +138,9 @@ function BarChart({ data }: BarChartProps) {
                 width={barW}
                 height={barH}
                 rx={Math.min(3, barW / 2)}
-                fill="#f97316"
-                opacity={0.85}
-                className="cursor-pointer hover:opacity-100 transition-opacity"
+                fill="#2C4A3E"
+                opacity={0.9}
+                className="cursor-pointer hover:fill-[#E04E5C] transition-colors"
                 onMouseEnter={(e) => {
                   const svgRect = (e.currentTarget.ownerSVGElement as SVGSVGElement).getBoundingClientRect()
                   setTooltip({
@@ -157,7 +158,8 @@ function BarChart({ data }: BarChartProps) {
                   y={PADDING_TOP + chartH + 16}
                   textAnchor="middle"
                   fontSize={10}
-                  fill="#9ca3af"
+                  fill="rgba(20,36,29,0.5)"
+                  fontFamily="DM Mono, monospace"
                 >
                   {labelDia(d.fecha)}
                 </text>
@@ -175,13 +177,13 @@ function BarChart({ data }: BarChartProps) {
               width={104}
               height={32}
               rx={6}
-              fill="#1f2937"
-              opacity={0.92}
+              fill="#14241D"
+              opacity={0.95}
             />
-            <text x={tooltip.x} y={tooltip.y - 22} textAnchor="middle" fontSize={10} fill="#d1d5db">
+            <text x={tooltip.x} y={tooltip.y - 22} textAnchor="middle" fontSize={10} fill="#E8E6CC" fontFamily="DM Mono, monospace">
               {tooltip.label}
             </text>
-            <text x={tooltip.x} y={tooltip.y - 9} textAnchor="middle" fontSize={11} fill="#fff" fontWeight="600">
+            <text x={tooltip.x} y={tooltip.y - 9} textAnchor="middle" fontSize={11} fill="#fff" fontWeight="600" fontFamily="DM Mono, monospace">
               {tooltip.value}
             </text>
           </g>
@@ -225,22 +227,22 @@ export function Ventas() {
     : '—'
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-sa-cream-paper">
       <div className="px-8 py-8 max-w-7xl mx-auto">
 
         {/* Header */}
         <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
-          <h2 className="text-2xl font-bold text-gray-900">Reportes de Ventas</h2>
+          <h2 className="text-3xl font-display text-sa-green-ink">Reportes de Ventas</h2>
           {/* Period selector */}
-          <div className="flex gap-1 bg-white border border-gray-200 rounded-xl p-1 shadow-sm">
+          <div className="flex gap-1 bg-white border border-sa-green-ink/10 rounded-sa p-1 shadow-sa-sm">
             {PERIODOS.map((p) => (
               <button
                 key={p.value}
                 onClick={() => setPeriodo(p.value)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-4 py-2 rounded-sa text-sm font-medium transition-colors ${
                   periodo === p.value
-                    ? 'bg-orange-500 text-white shadow-sm'
-                    : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'
+                    ? 'bg-sa-green text-sa-cream shadow-sa-sm'
+                    : 'text-sa-green-ink/60 hover:text-sa-green-ink hover:bg-sa-cream-soft'
                 }`}
               >
                 {p.label}
@@ -250,44 +252,44 @@ export function Ventas() {
         </div>
 
         {/* Demo banner */}
-        <div className="mb-6 flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-5 py-3">
+        <div className="mb-6 flex items-center gap-3 bg-sa-banana/20 border border-sa-banana/40 rounded-sa px-5 py-3">
           <span className="text-xl">🔌</span>
-          <p className="text-amber-800 text-sm font-medium">
+          <p className="text-sa-coffee text-sm font-medium">
             Datos de ejemplo — conecta Supabase para ver reportes reales
           </p>
         </div>
 
         {/* KPI Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-            <div className="flex items-center gap-2 text-gray-400 text-sm mb-2">
+          <div className="bg-white rounded-sa p-5 shadow-sa-sm border border-sa-green-ink/5">
+            <div className="flex items-center gap-2 text-sa-green-ink/60 font-mono text-xs uppercase tracking-wide mb-2">
               <span>💰</span> Ventas totales
             </div>
-            <p className="text-2xl font-bold text-gray-900">{formatMoney(totalPeriodo)}</p>
+            <p className="text-3xl font-display text-sa-green-ink leading-none">{formatMoney(totalPeriodo)}</p>
           </div>
-          <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-            <div className="flex items-center gap-2 text-gray-400 text-sm mb-2">
+          <div className="bg-white rounded-sa p-5 shadow-sa-sm border border-sa-green-ink/5">
+            <div className="flex items-center gap-2 text-sa-green-ink/60 font-mono text-xs uppercase tracking-wide mb-2">
               <span>🧾</span> Órdenes
             </div>
-            <p className="text-2xl font-bold text-gray-900">{totalOrdenes.toLocaleString('es-MX')}</p>
+            <p className="text-3xl font-display text-sa-green-ink leading-none">{totalOrdenes.toLocaleString('es-MX')}</p>
           </div>
-          <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-            <div className="flex items-center gap-2 text-gray-400 text-sm mb-2">
+          <div className="bg-white rounded-sa p-5 shadow-sa-sm border border-sa-green-ink/5">
+            <div className="flex items-center gap-2 text-sa-green-ink/60 font-mono text-xs uppercase tracking-wide mb-2">
               <span>🎯</span> Ticket promedio
             </div>
-            <p className="text-2xl font-bold text-gray-900">{formatMoney(ticketPromedio)}</p>
+            <p className="text-3xl font-display text-sa-green-ink leading-none">{formatMoney(ticketPromedio)}</p>
           </div>
-          <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-            <div className="flex items-center gap-2 text-gray-400 text-sm mb-2">
+          <div className="bg-white rounded-sa p-5 shadow-sa-sm border border-sa-green-ink/5">
+            <div className="flex items-center gap-2 text-sa-green-ink/60 font-mono text-xs uppercase tracking-wide mb-2">
               <span>📅</span> Mejor día
             </div>
-            <p className="text-base font-bold text-gray-900 leading-tight">{diaMejorLabel}</p>
+            <p className="text-base font-display text-sa-green-ink leading-tight">{diaMejorLabel}</p>
           </div>
         </div>
 
         {/* Bar chart */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6">
-          <h3 className="text-base font-semibold text-gray-800 mb-4">Ventas por día</h3>
+        <div className="bg-white rounded-sa p-6 shadow-sa-sm border border-sa-green-ink/5 mb-6">
+          <h3 className="text-xl font-display text-sa-green-ink mb-4">Ventas por día</h3>
           <BarChart data={ventasPorDia} />
         </div>
 
@@ -295,24 +297,24 @@ export function Ventas() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
 
           {/* Productos más vendidos */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <h3 className="text-base font-semibold text-gray-800 mb-4">Productos más vendidos</h3>
+          <div className="bg-white rounded-sa p-6 shadow-sa-sm border border-sa-green-ink/5">
+            <h3 className="text-xl font-display text-sa-green-ink mb-4">Productos más vendidos</h3>
             <div className="space-y-3">
               {productosMasVendidos.map((p, i) => {
                 const pct = (p.cantidad / maxProducto) * 100
                 return (
                   <div key={p.producto_id}>
                     <div className="flex items-center gap-3 mb-1">
-                      <span className="w-5 text-xs font-bold text-gray-400 text-right">{i + 1}</span>
-                      <span className="flex-1 text-sm font-medium text-gray-800 truncate">{p.nombre}</span>
-                      <span className="text-xs text-gray-500 whitespace-nowrap">{p.cantidad} uds</span>
-                      <span className="text-xs font-semibold text-gray-700 whitespace-nowrap w-20 text-right">
+                      <span className="w-5 text-xs font-mono font-bold text-sa-green-ink/40 text-right">{i + 1}</span>
+                      <span className="flex-1 text-sm font-medium text-sa-green-ink truncate">{p.nombre}</span>
+                      <span className="text-xs font-mono text-sa-green-ink/60 whitespace-nowrap">{p.cantidad} uds</span>
+                      <span className="text-xs font-mono font-semibold text-sa-green-ink whitespace-nowrap w-20 text-right">
                         {formatMoney(p.total)}
                       </span>
                     </div>
-                    <div className="ml-8 h-1.5 bg-orange-100 rounded-full overflow-hidden">
+                    <div className="ml-8 h-1.5 bg-sa-cream-warm rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-orange-400 rounded-full transition-all duration-500"
+                        className="h-full bg-sa-green rounded-full transition-all duration-500"
                         style={{ width: `${pct}%` }}
                       />
                     </div>
@@ -323,8 +325,8 @@ export function Ventas() {
           </div>
 
           {/* Ventas por método de pago */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <h3 className="text-base font-semibold text-gray-800 mb-4">Ventas por método de pago</h3>
+          <div className="bg-white rounded-sa p-6 shadow-sa-sm border border-sa-green-ink/5">
+            <h3 className="text-xl font-display text-sa-green-ink mb-4">Ventas por método de pago</h3>
             <div className="space-y-4">
               {ventasPorMetodo.map((m) => {
                 const pct = Math.round((m.total / totalMetodos) * 100)
@@ -332,21 +334,21 @@ export function Ventas() {
                   <div key={m.metodo}>
                     <div className="flex items-center gap-2 mb-1">
                       <span>{METODO_ICON[m.metodo] ?? '💳'}</span>
-                      <span className="flex-1 text-sm font-medium text-gray-700">
+                      <span className="flex-1 text-sm font-medium text-sa-green-ink/80">
                         {METODO_LABEL[m.metodo] ?? m.metodo}
                       </span>
-                      <span className="text-xs text-gray-500">{m.num_ordenes} órd.</span>
-                      <span className="text-xs font-semibold text-gray-800 w-24 text-right">
+                      <span className="text-xs font-mono text-sa-green-ink/60">{m.num_ordenes} órd.</span>
+                      <span className="text-xs font-mono font-semibold text-sa-green-ink w-24 text-right">
                         {formatMoney(m.total)}
                       </span>
-                      <span className="text-xs text-orange-600 font-bold w-8 text-right">{pct}%</span>
+                      <span className="text-xs font-mono text-sa-green-deep font-bold w-8 text-right">{pct}%</span>
                     </div>
-                    <div className="h-2 bg-orange-100 rounded-full overflow-hidden">
+                    <div className="h-2 bg-sa-cream-warm rounded-full overflow-hidden">
                       <div
                         className="h-full rounded-full transition-all duration-500"
                         style={{
                           width: `${pct}%`,
-                          background: 'linear-gradient(90deg, #fb923c, #f97316)',
+                          background: 'linear-gradient(90deg, #2C4A3E, #1A2E26)',
                         }}
                       />
                     </div>
@@ -358,23 +360,23 @@ export function Ventas() {
         </div>
 
         {/* Horas pico */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
-          <h3 className="text-base font-semibold text-gray-800 mb-1">Horas pico</h3>
-          <p className="text-xs text-gray-400 mb-4">Órdenes por hora del día</p>
+        <div className="bg-white rounded-sa p-6 shadow-sa-sm border border-sa-green-ink/5 mb-8">
+          <h3 className="text-xl font-display text-sa-green-ink mb-1">Horas pico</h3>
+          <p className="text-xs font-mono text-sa-green-ink/50 mb-4 uppercase tracking-wide">Órdenes por hora del día</p>
           <div className="flex gap-1 items-end">
             {horasPico.map((h) => {
               const intensity = h.num_ordenes / maxHora
-              // Map intensity to orange shades
+              // Map intensity to brand green shades
               const bg =
                 intensity < 0.15
-                  ? '#fff7ed'
+                  ? '#F2EFD9'
                   : intensity < 0.3
-                  ? '#ffedd5'
+                  ? '#DDD9B8'
                   : intensity < 0.5
-                  ? '#fed7aa'
+                  ? '#88C0A0'
                   : intensity < 0.7
-                  ? '#fb923c'
-                  : '#ea580c'
+                  ? '#2C4A3E'
+                  : '#1A2E26'
               return (
                 <div key={h.hora} className="flex-1 flex flex-col items-center gap-1 group relative">
                   <div
@@ -383,7 +385,7 @@ export function Ventas() {
                     title={`${h.hora}h: ${h.num_ordenes} órdenes`}
                   />
                   {h.hora % 6 === 0 && (
-                    <span className="text-xs text-gray-400">{h.hora}h</span>
+                    <span className="text-xs font-mono text-sa-green-ink/50">{h.hora}h</span>
                   )}
                 </div>
               )
@@ -391,11 +393,11 @@ export function Ventas() {
           </div>
           {/* Legend */}
           <div className="flex items-center gap-2 mt-3 justify-end">
-            <span className="text-xs text-gray-400">Menos</span>
-            {['#fff7ed', '#ffedd5', '#fed7aa', '#fb923c', '#ea580c'].map((c) => (
+            <span className="text-xs font-mono text-sa-green-ink/50">Menos</span>
+            {['#F2EFD9', '#DDD9B8', '#88C0A0', '#2C4A3E', '#1A2E26'].map((c) => (
               <div key={c} className="w-4 h-3 rounded-sm" style={{ background: c }} />
             ))}
-            <span className="text-xs text-gray-400">Más</span>
+            <span className="text-xs font-mono text-sa-green-ink/50">Más</span>
           </div>
         </div>
 

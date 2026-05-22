@@ -60,32 +60,32 @@ export function ModalMerma({ open, onClose, onGuardar, insumos, almacenes, lotes
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Insumo *</label>
-            <select value={form.insumo_id} onChange={(e) => setForm((f) => ({ ...f, insumo_id: e.target.value, lote_id: '' }))} className="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white">
+            <label className="block text-sm font-medium text-sa-green-ink/80 mb-1">Insumo *</label>
+            <select value={form.insumo_id} onChange={(e) => setForm((f) => ({ ...f, insumo_id: e.target.value, lote_id: '' }))} className="w-full border border-sa-green-ink/15 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sa-green/40 bg-white">
               <option value="">Selecciona</option>
               {insumos.map((i) => <option key={i.id} value={i.id}>{i.nombre}</option>)}
             </select>
-            {errores.insumo_id && <p className="text-red-500 text-xs mt-1">{errores.insumo_id}</p>}
+            {errores.insumo_id && <p className="text-sa-strawberry text-xs mt-1">{errores.insumo_id}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Almacén *</label>
-            <select value={form.almacen_id} onChange={(e) => setForm((f) => ({ ...f, almacen_id: e.target.value }))} className="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white">
+            <label className="block text-sm font-medium text-sa-green-ink/80 mb-1">Almacén *</label>
+            <select value={form.almacen_id} onChange={(e) => setForm((f) => ({ ...f, almacen_id: e.target.value }))} className="w-full border border-sa-green-ink/15 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sa-green/40 bg-white">
               <option value="">Selecciona</option>
               {almacenes.map((a) => <option key={a.id} value={a.id}>{a.nombre}</option>)}
             </select>
-            {errores.almacen_id && <p className="text-red-500 text-xs mt-1">{errores.almacen_id}</p>}
+            {errores.almacen_id && <p className="text-sa-strawberry text-xs mt-1">{errores.almacen_id}</p>}
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Cantidad *</label>
-            <input type="number" min={0.01} step={0.01} value={form.cantidad || ''} onChange={(e) => setForm((f) => ({ ...f, cantidad: parseFloat(e.target.value) || 0 }))} placeholder="0" className="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400" />
-            {errores.cantidad && <p className="text-red-500 text-xs mt-1">{errores.cantidad}</p>}
+            <label className="block text-sm font-medium text-sa-green-ink/80 mb-1">Cantidad *</label>
+            <input type="number" min={0.01} step={0.01} value={form.cantidad || ''} onChange={(e) => setForm((f) => ({ ...f, cantidad: parseFloat(e.target.value) || 0 }))} placeholder="0" className="w-full border border-sa-green-ink/15 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sa-green/40" />
+            {errores.cantidad && <p className="text-sa-strawberry text-xs mt-1">{errores.cantidad}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Lote (opcional)</label>
-            <select value={form.lote_id} onChange={(e) => setForm((f) => ({ ...f, lote_id: e.target.value }))} className="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white disabled:opacity-50" disabled={lotesDisponibles.length === 0}>
+            <label className="block text-sm font-medium text-sa-green-ink/80 mb-1">Lote (opcional)</label>
+            <select value={form.lote_id} onChange={(e) => setForm((f) => ({ ...f, lote_id: e.target.value }))} className="w-full border border-sa-green-ink/15 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sa-green/40 bg-white disabled:opacity-50" disabled={lotesDisponibles.length === 0}>
               <option value="">Sin lote</option>
               {lotesDisponibles.map((l) => <option key={l.id} value={l.id}>{l.numero_lote ?? `Lote ${l.id.slice(-4)}`}</option>)}
             </select>
@@ -93,10 +93,10 @@ export function ModalMerma({ open, onClose, onGuardar, insumos, almacenes, lotes
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de merma</label>
+          <label className="block text-sm font-medium text-sa-green-ink/80 mb-2">Tipo de merma</label>
           <div className="grid grid-cols-4 gap-2">
             {TIPOS.map((t) => (
-              <button key={t.value} type="button" onClick={() => setForm((f) => ({ ...f, tipo: t.value }))} className={`flex flex-col items-center py-3 rounded-xl border-2 text-xs font-medium transition-colors ${form.tipo === t.value ? 'border-orange-500 bg-orange-50 text-orange-600' : 'border-gray-200 text-gray-600 hover:border-gray-300'}`}>
+              <button key={t.value} type="button" onClick={() => setForm((f) => ({ ...f, tipo: t.value }))} className={`flex flex-col items-center py-3 rounded-xl border-2 text-xs font-medium transition-colors ${form.tipo === t.value ? 'border-sa-green bg-sa-cream-soft text-sa-green-deep' : 'border-sa-green-ink/10 text-sa-green-ink/70 hover:border-sa-green-ink/15'}`}>
                 <span className="text-lg mb-1">{t.icon}</span>
                 {t.label}
               </button>
@@ -105,13 +105,13 @@ export function ModalMerma({ open, onClose, onGuardar, insumos, almacenes, lotes
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Notas</label>
-          <textarea value={form.notas} onChange={(e) => setForm((f) => ({ ...f, notas: e.target.value }))} placeholder="Descripción de la merma..." rows={2} className="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-orange-400" />
+          <label className="block text-sm font-medium text-sa-green-ink/80 mb-1">Notas</label>
+          <textarea value={form.notas} onChange={(e) => setForm((f) => ({ ...f, notas: e.target.value }))} placeholder="Descripción de la merma..." rows={2} className="w-full border border-sa-green-ink/15 rounded-xl px-3 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-sa-green/40" />
         </div>
 
         <div className="flex gap-3 pt-2">
-          <button type="button" onClick={onClose} className="flex-1 border border-gray-300 text-gray-700 py-2.5 rounded-xl font-medium text-sm hover:bg-gray-50">Cancelar</button>
-          <button type="submit" className="flex-1 bg-red-500 text-white py-2.5 rounded-xl font-medium text-sm hover:bg-red-600">Registrar merma</button>
+          <button type="button" onClick={onClose} className="flex-1 border border-sa-green-ink/15 text-sa-green-ink/80 py-2.5 rounded-xl font-medium text-sm hover:bg-sa-cream-paper">Cancelar</button>
+          <button type="submit" className="flex-1 bg-sa-strawberry text-white py-2.5 rounded-xl font-medium text-sm hover:opacity-90">Registrar merma</button>
         </div>
       </form>
     </Modal>

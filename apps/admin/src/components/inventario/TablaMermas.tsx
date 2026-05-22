@@ -2,10 +2,10 @@ import React from 'react'
 import type { Merma, Insumo, Almacen } from '../../hooks/useInventario'
 
 const TIPO_CONFIG: Record<Merma['tipo'], { label: string; clase: string }> = {
-  vencimiento: { label: '📅 Vencimiento', clase: 'bg-red-100 text-red-700' },
-  accidente:   { label: '💥 Accidente',   clase: 'bg-orange-100 text-orange-700' },
-  calidad:     { label: '🔍 Calidad',     clase: 'bg-yellow-100 text-yellow-700' },
-  otro:        { label: '📌 Otro',        clase: 'bg-gray-100 text-gray-600' },
+  vencimiento: { label: '📅 Vencimiento', clase: 'bg-sa-strawberry/15 text-sa-strawberry' },
+  accidente:   { label: '💥 Accidente',   clase: 'bg-sa-cream-warm text-sa-green-deep' },
+  calidad:     { label: '🔍 Calidad',     clase: 'bg-sa-banana/30 text-sa-coffee' },
+  otro:        { label: '📌 Otro',        clase: 'bg-sa-cream-warm text-sa-green-ink/70' },
 }
 
 interface Props {
@@ -24,26 +24,26 @@ export function TablaMermas({ mermas, insumos, almacenes }: Props) {
     <div>
       {/* Summary */}
       <div className="flex gap-4 mb-4">
-        <div className="bg-white rounded-2xl px-5 py-3 shadow-sm border border-gray-100 flex items-center gap-3">
+        <div className="bg-white rounded-sa px-5 py-3 shadow-sa-sm border border-sa-green-ink/5 flex items-center gap-3">
           <span className="text-2xl">🗑️</span>
           <div>
-            <p className="text-xs text-gray-500">Total mermas registradas</p>
-            <p className="text-xl font-bold text-gray-900">{mermas.length}</p>
+            <p className="text-xs text-sa-green-ink/60">Total mermas registradas</p>
+            <p className="text-xl font-bold text-sa-green-ink">{mermas.length}</p>
           </div>
         </div>
-        <div className="bg-white rounded-2xl px-5 py-3 shadow-sm border border-gray-100 flex items-center gap-3">
+        <div className="bg-white rounded-sa px-5 py-3 shadow-sa-sm border border-sa-green-ink/5 flex items-center gap-3">
           <span className="text-2xl">💸</span>
           <div>
-            <p className="text-xs text-gray-500">Costo total de mermas</p>
-            <p className="text-xl font-bold text-red-600">${totalCosto.toFixed(2)}</p>
+            <p className="text-xs text-sa-green-ink/60">Costo total de mermas</p>
+            <p className="text-xl font-bold text-sa-strawberry">${totalCosto.toFixed(2)}</p>
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-sa shadow-sa-sm border border-sa-green-ink/5 overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-gray-100 text-left text-xs text-gray-500 uppercase tracking-wide">
+            <tr className="border-b border-sa-green-ink/5 text-left text-xs text-sa-green-ink/60 uppercase tracking-wide">
               <th className="px-5 py-3 font-medium">Fecha</th>
               <th className="px-5 py-3 font-medium">Insumo</th>
               <th className="px-5 py-3 font-medium">Almacén</th>
@@ -53,38 +53,38 @@ export function TablaMermas({ mermas, insumos, almacenes }: Props) {
               <th className="px-5 py-3 font-medium">Notas</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-50">
+          <tbody className="divide-y divide-sa-green-ink/5">
             {mermas.map((m) => {
               const insumo = insumos.find((i) => i.id === m.insumo_id)
               const almacen = almacenes.find((a) => a.id === m.almacen_id)
               const costo = m.cantidad * (insumo?.costo_unitario ?? 0)
               const cfg = TIPO_CONFIG[m.tipo]
               return (
-                <tr key={m.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-5 py-3 text-gray-500 text-xs whitespace-nowrap">
+                <tr key={m.id} className="hover:bg-sa-cream-paper transition-colors">
+                  <td className="px-5 py-3 text-sa-green-ink/60 text-xs whitespace-nowrap">
                     {new Date(m.created_at).toLocaleDateString('es-MX', { day: '2-digit', month: 'short' })}
                     {' '}
                     {new Date(m.created_at).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}
                   </td>
-                  <td className="px-5 py-3 font-medium text-gray-900">{insumo?.nombre ?? '—'}</td>
-                  <td className="px-5 py-3 text-gray-500 text-xs">{almacen?.nombre ?? '—'}</td>
-                  <td className="px-5 py-3 text-right font-semibold text-gray-900">
-                    {m.cantidad.toFixed(1)} <span className="text-gray-400 text-xs font-normal">{insumo?.unidad}</span>
+                  <td className="px-5 py-3 font-medium text-sa-green-ink">{insumo?.nombre ?? '—'}</td>
+                  <td className="px-5 py-3 text-sa-green-ink/60 text-xs">{almacen?.nombre ?? '—'}</td>
+                  <td className="px-5 py-3 text-right font-semibold text-sa-green-ink">
+                    {m.cantidad.toFixed(1)} <span className="text-sa-green-ink/40 text-xs font-normal">{insumo?.unidad}</span>
                   </td>
-                  <td className="px-5 py-3 text-right text-red-600 font-medium">${costo.toFixed(2)}</td>
+                  <td className="px-5 py-3 text-right text-sa-strawberry font-medium">${costo.toFixed(2)}</td>
                   <td className="px-5 py-3">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${cfg.clase}`}>
                       {cfg.label}
                     </span>
                   </td>
-                  <td className="px-5 py-3 text-gray-500 text-xs">{m.notas ?? <span className="text-gray-300">—</span>}</td>
+                  <td className="px-5 py-3 text-sa-green-ink/60 text-xs">{m.notas ?? <span className="text-sa-green-ink/25">—</span>}</td>
                 </tr>
               )
             })}
           </tbody>
         </table>
         {mermas.length === 0 && (
-          <div className="text-center py-12 text-gray-400">
+          <div className="text-center py-12 text-sa-green-ink/40">
             <p>Sin mermas registradas</p>
           </div>
         )}

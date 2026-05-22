@@ -142,23 +142,23 @@ export function ModalEmpleado({ open, onClose, onGuardar, empleado }: Props) {
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Nombre */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Nombre <span className="text-red-500">*</span>
+          <label className="block text-sm font-medium text-sa-green-ink mb-1">
+            Nombre <span className="text-sa-strawberry">*</span>
           </label>
           <input
             type="text"
             value={form.nombre}
             onChange={(e) => set('nombre', e.target.value)}
             placeholder="Ej. Juan López"
-            className="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="w-full border border-sa-green-ink/15 bg-white rounded-sa px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sa-green/40"
           />
-          {errores.nombre && <p className="text-red-500 text-xs mt-1">{errores.nombre}</p>}
+          {errores.nombre && <p className="text-sa-strawberry text-xs mt-1">{errores.nombre}</p>}
         </div>
 
         {/* Rol */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Rol <span className="text-red-500">*</span>
+          <label className="block text-sm font-medium text-sa-green-ink mb-2">
+            Rol <span className="text-sa-strawberry">*</span>
           </label>
           <div className="grid grid-cols-5 gap-2">
             {ROLES.map(({ rol, label, emoji }) => (
@@ -166,10 +166,10 @@ export function ModalEmpleado({ open, onClose, onGuardar, empleado }: Props) {
                 key={rol}
                 type="button"
                 onClick={() => set('rol', rol)}
-                className={`flex flex-col items-center gap-1 py-3 rounded-xl border-2 text-xs font-medium transition-colors ${
+                className={`flex flex-col items-center gap-1 py-3 rounded-sa border-2 text-xs font-medium transition-colors ${
                   form.rol === rol
-                    ? 'border-orange-500 bg-orange-50 text-orange-600'
-                    : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                    ? 'border-sa-green bg-sa-green/10 text-sa-green-deep'
+                    : 'border-sa-green-ink/15 text-sa-green-ink/70 hover:border-sa-green-ink/30 bg-white'
                 }`}
               >
                 <span className="text-xl">{emoji}</span>
@@ -181,8 +181,8 @@ export function ModalEmpleado({ open, onClose, onGuardar, empleado }: Props) {
 
         {/* PIN */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            PIN {empleado ? <span className="text-gray-400 font-normal">(dejar vacío para mantener)</span> : <span className="text-red-500">*</span>}
+          <label className="block text-sm font-medium text-sa-green-ink mb-1">
+            PIN {empleado ? <span className="text-sa-green-ink/50 font-normal">(dejar vacío para mantener)</span> : <span className="text-sa-strawberry">*</span>}
           </label>
           <div className="flex gap-3 justify-start" onFocus={() => setPinFocused(true)} onBlur={() => setPinFocused(false)}>
             {pinDigits.map((digit, i) => (
@@ -197,17 +197,17 @@ export function ModalEmpleado({ open, onClose, onGuardar, empleado }: Props) {
                 onKeyDown={(e) => handlePinKeyDown(i, e)}
                 onPaste={handlePinPaste}
                 placeholder={empleado && !pinTouched ? '•' : '_'}
-                className={`w-12 h-12 text-center text-lg font-bold border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 transition-colors ${
+                className={`w-12 h-12 text-center text-lg font-mono font-bold border-2 rounded-sa focus:outline-none focus:ring-2 focus:ring-sa-green/40 transition-colors ${
                   errores.pin
-                    ? 'border-red-400 bg-red-50'
+                    ? 'border-sa-strawberry/60 bg-sa-strawberry/10'
                     : digit
-                    ? 'border-orange-400 bg-orange-50 text-orange-600'
-                    : 'border-gray-300 text-gray-400'
+                    ? 'border-sa-green bg-sa-green/10 text-sa-green-deep'
+                    : 'border-sa-green-ink/15 text-sa-green-ink/40 bg-white'
                 }`}
               />
             ))}
           </div>
-          {errores.pin && <p className="text-red-500 text-xs mt-1">{errores.pin}</p>}
+          {errores.pin && <p className="text-sa-strawberry text-xs mt-1">{errores.pin}</p>}
         </div>
 
         {/* Activo */}
@@ -215,7 +215,7 @@ export function ModalEmpleado({ open, onClose, onGuardar, empleado }: Props) {
           <div
             onClick={() => set('activo', !form.activo)}
             className={`relative w-11 h-6 rounded-full transition-colors ${
-              form.activo ? 'bg-orange-500' : 'bg-gray-300'
+              form.activo ? 'bg-sa-green' : 'bg-sa-green-ink/20'
             }`}
           >
             <span
@@ -224,7 +224,7 @@ export function ModalEmpleado({ open, onClose, onGuardar, empleado }: Props) {
               }`}
             />
           </div>
-          <span className="text-sm font-medium text-gray-700">Empleado activo</span>
+          <span className="text-sm font-medium text-sa-green-ink">Empleado activo</span>
         </label>
 
         {/* Acciones */}
@@ -232,14 +232,14 @@ export function ModalEmpleado({ open, onClose, onGuardar, empleado }: Props) {
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 border border-gray-300 text-gray-700 py-2.5 rounded-xl font-medium text-sm hover:bg-gray-50"
+            className="flex-1 border border-sa-green-ink/15 text-sa-green-ink py-2.5 rounded-sa font-medium text-sm hover:bg-sa-cream-warm/50"
           >
             Cancelar
           </button>
           <button
             type="submit"
             disabled={guardando}
-            className="flex-1 bg-orange-500 disabled:opacity-50 text-white py-2.5 rounded-xl font-medium text-sm hover:bg-orange-600"
+            className="flex-1 bg-sa-green disabled:opacity-50 text-sa-cream py-2.5 rounded-sa font-medium text-sm hover:bg-sa-green-deep"
           >
             {guardando ? 'Guardando...' : empleado ? 'Actualizar' : 'Crear empleado'}
           </button>

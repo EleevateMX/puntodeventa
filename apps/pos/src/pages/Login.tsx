@@ -42,96 +42,132 @@ export function Login() {
       )
       navigate('/')
     } else {
-      setError('PIN incorrecto')
+      setError('Ese PIN no agita, intenta de nuevo')
       setPin('')
     }
   }
 
-  const TECLADO = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', '⌫']
+  const TECLADO = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'C', '0', '⌫']
 
   return (
-    <div className="h-screen flex items-center justify-center bg-gray-900">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-extrabold text-gray-900">POS — Caja</h1>
-          <p className="text-gray-400 mt-1">Selecciona tu nombre e ingresa tu PIN</p>
+    <div className="min-h-screen bg-sa-green-deep flex flex-col items-center justify-center px-4 py-8">
+      {/* Logo */}
+      <img
+        src="/logo.png"
+        alt="Shake Aholic"
+        className="w-[180px] h-auto mb-6 drop-shadow-2xl"
+      />
+
+      <div className="bg-sa-cream-soft rounded-sa-lg shadow-sa w-full max-w-2xl p-8">
+        <div className="text-center mb-6">
+          <h1 className="font-display text-4xl text-sa-green-ink leading-none">¿Quién agita hoy?</h1>
+          <p className="font-body text-sa-green-ink/60 mt-2 text-sm">
+            Toca tu nombre y mete tu PIN
+          </p>
         </div>
 
         {/* Employee selector */}
-        <div className="grid grid-cols-3 gap-3 mb-8">
-          {DEMO_EMPLEADOS.map((emp) => (
-            <button
-              key={emp.id}
-              onClick={() => seleccionarEmpleado(emp)}
-              className={`py-4 rounded-2xl border-2 transition-all text-center ${
-                empleadoSeleccionado?.id === emp.id
-                  ? 'border-orange-500 bg-orange-50'
-                  : 'border-gray-200 hover:border-gray-300 bg-white'
-              }`}
-            >
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white font-bold text-xl mx-auto mb-2">
-                {emp.nombre[0]}
-              </div>
-              <p className="font-semibold text-sm text-gray-900 leading-tight">{emp.nombre}</p>
-              <p className="text-xs text-gray-400 capitalize mt-0.5">{emp.rol}</p>
-            </button>
-          ))}
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          {DEMO_EMPLEADOS.map((emp) => {
+            const activo = empleadoSeleccionado?.id === emp.id
+            return (
+              <button
+                key={emp.id}
+                onClick={() => seleccionarEmpleado(emp)}
+                className={`py-5 px-3 rounded-sa transition-all text-center border ${
+                  activo
+                    ? 'bg-sa-cream border-sa-green shadow-sa-sm'
+                    : 'bg-sa-cream-warm border-transparent hover:bg-sa-cream'
+                }`}
+              >
+                <div className="w-14 h-14 rounded-full bg-sa-green flex items-center justify-center text-sa-cream font-display text-2xl mx-auto mb-2">
+                  {emp.nombre[0]}
+                </div>
+                <p className={`font-display text-base leading-tight ${activo ? 'text-sa-green' : 'text-sa-green-ink'}`}>
+                  {emp.nombre.split(' ')[0]}
+                </p>
+                <p className="font-mono text-[10px] uppercase tracking-wide text-sa-green-ink/50 mt-1">
+                  {emp.rol}
+                </p>
+              </button>
+            )
+          })}
         </div>
 
         {/* PIN pad */}
         {empleadoSeleccionado && (
           <div className="max-w-xs mx-auto">
+            <p className="text-center font-display text-2xl text-sa-green mb-3">
+              Hola, {empleadoSeleccionado.nombre.split(' ')[0]}
+            </p>
+
             {/* PIN dots */}
-            <div className="flex justify-center gap-3 mb-6">
+            <div className="flex justify-center gap-3 mb-5">
               {Array.from({ length: Math.max(pin.length, 4) }).map((_, i) => (
                 <div
                   key={i}
                   className={`w-4 h-4 rounded-full transition-all ${
-                    i < pin.length ? 'bg-orange-500' : 'bg-gray-200'
+                    i < pin.length ? 'bg-sa-green' : 'bg-sa-cream-warm'
                   }`}
                 />
               ))}
             </div>
 
             {error && (
-              <p className="text-center text-red-500 text-sm mb-4 font-medium">{error}</p>
+              <p className="text-center text-sa-strawberry text-sm mb-4 font-mono">{error}</p>
             )}
 
             {/* Number pad */}
             <div className="grid grid-cols-3 gap-3">
-              {TECLADO.map((digit, i) => (
-                digit === '' ? (
-                  <div key={i} />
-                ) : digit === '⌫' ? (
-                  <button
-                    key={i}
-                    onClick={borrar}
-                    className="h-14 rounded-2xl bg-gray-100 hover:bg-gray-200 text-gray-500 font-medium text-xl transition-colors flex items-center justify-center"
-                  >
-                    ⌫
-                  </button>
-                ) : (
+              {TECLADO.map((digit, i) => {
+                if (digit === 'C') {
+                  return (
+                    <button
+                      key={i}
+                      onClick={() => { setPin(''); setError('') }}
+                      className="h-16 rounded-sa bg-sa-strawberry hover:brightness-110 text-white font-display text-2xl transition-all flex items-center justify-center"
+                    >
+                      C
+                    </button>
+                  )
+                }
+                if (digit === '⌫') {
+                  return (
+                    <button
+                      key={i}
+                      onClick={borrar}
+                      className="h-16 rounded-sa bg-sa-cream-warm hover:bg-sa-cream text-sa-green-ink font-display text-2xl transition-colors flex items-center justify-center"
+                    >
+                      ⌫
+                    </button>
+                  )
+                }
+                return (
                   <button
                     key={i}
                     onClick={() => presionarDigito(digit)}
-                    className="h-14 rounded-2xl bg-gray-100 hover:bg-orange-50 hover:text-orange-600 font-bold text-xl transition-colors"
+                    className="h-16 rounded-sa bg-sa-cream hover:bg-sa-cream-warm text-sa-green-ink font-display text-2xl transition-colors"
                   >
                     {digit}
                   </button>
                 )
-              ))}
+              })}
             </div>
 
             <button
               onClick={validarPin}
               disabled={pin.length < 4}
-              className="w-full mt-4 bg-orange-500 disabled:opacity-40 text-white py-4 rounded-2xl font-bold text-lg hover:bg-orange-600 transition-colors"
+              className="w-full mt-5 bg-sa-green disabled:opacity-40 text-sa-cream py-4 rounded-sa-lg font-display text-xl hover:bg-sa-green-deep transition-colors"
             >
-              Entrar
+              A agitar
             </button>
           </div>
         )}
       </div>
+
+      <p className="font-mono text-xs text-sa-cream/40 mt-6 uppercase tracking-widest">
+        Shake Aholic · POS
+      </p>
     </div>
   )
 }

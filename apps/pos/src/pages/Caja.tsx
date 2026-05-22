@@ -28,7 +28,7 @@ const DEMO_PRODUCTOS: Producto[] = [
 
 export function Caja() {
   const navigate = useNavigate()
-  const { empleadoActivo, cerrarSesion, totalItems, limpiarOrden } = usePosStore()
+  const { empleadoActivo, cerrarSesion, limpiarOrden } = usePosStore()
   const [horaActual, setHoraActual] = useState(new Date())
 
   useEffect(() => {
@@ -39,38 +39,37 @@ export function Caja() {
   const hora = horaActual.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })
 
   return (
-    <div className="h-screen flex flex-col bg-gray-100 overflow-hidden">
+    <div className="h-screen flex flex-col bg-sa-cream-paper overflow-hidden">
       {/* Top bar */}
-      <header className="flex items-center justify-between px-5 py-2.5 bg-gray-900 text-white flex-shrink-0">
+      <header className="flex items-center justify-between px-5 py-2.5 bg-sa-green-deep text-sa-cream flex-shrink-0 border-b border-sa-cream/10">
         <div className="flex items-center gap-3">
-          <span className="text-orange-400 font-bold text-lg">POS</span>
-          <span className="text-gray-500">|</span>
-          <span className="text-sm text-gray-300">Sucursal Principal</span>
+          <img src="/logo.png" alt="Shake Aholic" className="h-[110px] w-auto -my-6" />
+          <span className="font-mono text-xs uppercase tracking-widest text-sa-cream/50">Sucursal Principal</span>
         </div>
         <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-400">{hora}</span>
-          <span className="text-sm text-gray-300">
-            👤 {empleadoActivo?.nombre}
+          <span className="font-mono text-sm text-sa-cream/70">{hora}</span>
+          <span className="font-display text-lg text-sa-cream">
+            {empleadoActivo?.nombre.split(' ')[0]}
           </span>
           <button
             onClick={() => navigate('/corte')}
-            className="text-xs bg-gray-700 hover:bg-gray-600 px-3 py-1.5 rounded-lg text-gray-300 transition-colors"
+            className="font-mono text-xs uppercase tracking-wide bg-sa-cream-warm/10 hover:bg-sa-cream-warm/20 text-sa-cream px-4 py-2 rounded-full transition-colors border border-sa-cream/20"
           >
             Corte de caja
           </button>
           <button
             onClick={() => { limpiarOrden(); cerrarSesion() }}
-            className="text-xs bg-red-900 hover:bg-red-800 px-3 py-1.5 rounded-lg text-red-300 transition-colors"
+            className="font-mono text-xs uppercase tracking-wide bg-sa-strawberry/15 hover:bg-sa-strawberry/30 text-sa-strawberry px-4 py-2 rounded-full transition-colors border border-sa-strawberry/30"
           >
-            Cerrar sesión
+            Salir
           </button>
         </div>
       </header>
 
       {/* Main split layout */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden gap-3 p-3">
         {/* Left: Catalog */}
-        <div className="flex-1 flex flex-col overflow-hidden border-r border-gray-200 bg-white">
+        <div className="flex-1 flex flex-col overflow-hidden bg-sa-cream-soft rounded-sa shadow-sa-sm">
           <CatalogoBusqueda
             productos={DEMO_PRODUCTOS}
             categorias={DEMO_CATEGORIAS}
@@ -78,7 +77,7 @@ export function Caja() {
         </div>
 
         {/* Right: Order panel */}
-        <div className="w-80 flex-shrink-0 flex flex-col bg-white overflow-hidden">
+        <div className="w-96 flex-shrink-0 flex flex-col bg-white rounded-sa shadow-sa-sm overflow-hidden">
           <OrdenPanel onCobrar={() => navigate('/cobro')} />
         </div>
       </div>

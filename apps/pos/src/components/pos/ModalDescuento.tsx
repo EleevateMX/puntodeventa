@@ -22,24 +22,28 @@ export function ModalDescuento({ open, onClose, descuentoActual, onAplicar, onQu
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Aplicar descuento</h3>
+      <div className="absolute inset-0 bg-sa-green-deep/60" onClick={onClose} />
+      <div className="relative bg-sa-cream-soft rounded-sa-lg shadow-sa w-full max-w-sm p-6">
+        <h3 className="font-display text-2xl text-sa-green-ink mb-4">Aplica descuento</h3>
 
         {/* Tipo */}
         <div className="flex gap-2 mb-4">
           <button
             onClick={() => setTipo('porcentaje')}
-            className={`flex-1 py-2.5 rounded-xl text-sm font-medium border-2 transition-colors ${
-              tipo === 'porcentaje' ? 'border-orange-500 bg-orange-50 text-orange-600' : 'border-gray-200 text-gray-600'
+            className={`flex-1 py-2.5 rounded-full font-mono text-xs uppercase tracking-wide transition-colors ${
+              tipo === 'porcentaje'
+                ? 'bg-sa-green text-sa-cream'
+                : 'bg-white text-sa-green-ink/60 border border-sa-green-ink/10'
             }`}
           >
             % Porcentaje
           </button>
           <button
             onClick={() => setTipo('monto')}
-            className={`flex-1 py-2.5 rounded-xl text-sm font-medium border-2 transition-colors ${
-              tipo === 'monto' ? 'border-orange-500 bg-orange-50 text-orange-600' : 'border-gray-200 text-gray-600'
+            className={`flex-1 py-2.5 rounded-full font-mono text-xs uppercase tracking-wide transition-colors ${
+              tipo === 'monto'
+                ? 'bg-sa-green text-sa-cream'
+                : 'bg-white text-sa-green-ink/60 border border-sa-green-ink/10'
             }`}
           >
             $ Monto fijo
@@ -53,8 +57,10 @@ export function ModalDescuento({ open, onClose, descuentoActual, onAplicar, onQu
               <button
                 key={p}
                 onClick={() => setValor(String(p))}
-                className={`flex-1 py-2 rounded-xl text-sm font-medium transition-colors ${
-                  valor === String(p) ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                className={`flex-1 py-2.5 rounded-sa font-mono text-sm transition-colors ${
+                  valor === String(p)
+                    ? 'bg-sa-banana text-sa-green-ink'
+                    : 'bg-sa-cream-warm text-sa-green-ink/70 hover:bg-sa-banana/60'
                 }`}
               >
                 {p}%
@@ -65,7 +71,7 @@ export function ModalDescuento({ open, onClose, descuentoActual, onAplicar, onQu
 
         {/* Value input */}
         <div className="relative mb-3">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 font-mono text-sa-green-ink/40 text-lg">
             {tipo === 'porcentaje' ? '%' : '$'}
           </span>
           <input
@@ -75,16 +81,20 @@ export function ModalDescuento({ open, onClose, descuentoActual, onAplicar, onQu
             value={valor}
             onChange={(e) => setValor(e.target.value)}
             placeholder="0"
-            className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-xl text-lg font-bold focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="w-full pl-10 pr-4 py-3 bg-white border border-sa-green-ink/10 rounded-sa font-mono text-2xl text-sa-green-ink focus:outline-none focus:ring-2 focus:ring-sa-green/30"
             autoFocus
           />
         </div>
 
         {/* Preview */}
         {valorNum > 0 && (
-          <div className="bg-green-50 rounded-xl px-4 py-2 mb-4 flex justify-between text-sm">
-            <span className="text-green-700">Ahorro</span>
-            <span className="text-green-700 font-bold">−${descuentoCalculado.toFixed(2)}</span>
+          <div className="bg-white rounded-sa px-4 py-3 mb-4 flex justify-between items-center border border-sa-strawberry/20">
+            <span className="font-mono text-xs uppercase tracking-wide text-sa-green-ink/60">
+              Ahorro
+            </span>
+            <span className="font-mono text-lg font-medium text-sa-strawberry">
+              −${descuentoCalculado.toFixed(2)}
+            </span>
           </div>
         )}
 
@@ -93,21 +103,21 @@ export function ModalDescuento({ open, onClose, descuentoActual, onAplicar, onQu
           {descuentoActual && (
             <button
               onClick={onQuitar}
-              className="px-4 py-2.5 border border-red-200 text-red-600 rounded-xl text-sm font-medium hover:bg-red-50"
+              className="px-4 py-2.5 border border-sa-strawberry/30 text-sa-strawberry rounded-full font-mono text-xs uppercase tracking-wide hover:bg-sa-strawberry/10"
             >
               Quitar
             </button>
           )}
           <button
             onClick={onClose}
-            className="flex-1 border border-gray-200 text-gray-700 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-50"
+            className="flex-1 border border-sa-green-ink/15 bg-white text-sa-green-ink/70 py-2.5 rounded-full font-mono text-xs uppercase tracking-wide hover:bg-sa-cream-warm"
           >
             Cancelar
           </button>
           <button
             onClick={() => valorNum > 0 && onAplicar({ tipo, valor: valorNum })}
             disabled={valorNum <= 0}
-            className="flex-1 bg-orange-500 disabled:opacity-40 text-white py-2.5 rounded-xl text-sm font-medium hover:bg-orange-600"
+            className="flex-1 bg-sa-green disabled:opacity-40 text-sa-cream py-2.5 rounded-full font-mono text-xs uppercase tracking-wide hover:bg-sa-green-deep"
           >
             Aplicar
           </button>

@@ -10,10 +10,10 @@ const DEMO_CLIENTES: ClientePOS[] = [
 ]
 
 const NIVEL_COLOR: Record<string, string> = {
-  bronce: 'bg-amber-100 text-amber-700',
-  plata: 'bg-gray-100 text-gray-600',
-  oro: 'bg-yellow-100 text-yellow-700',
-  platino: 'bg-purple-100 text-purple-700',
+  bronce: 'bg-sa-mango/30 text-sa-green-ink border-sa-mango',
+  plata: 'bg-sa-cream-warm text-sa-green-ink border-sa-green-ink/15',
+  oro: 'bg-sa-banana/40 text-sa-green-ink border-sa-banana',
+  platino: 'bg-sa-mint/40 text-sa-green-ink border-sa-mint',
 }
 
 interface Props {
@@ -45,13 +45,16 @@ export function ModalCliente({ open, onClose }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-sm">
-        <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h3 className="font-bold text-gray-900">Buscar cliente</h3>
+      <div className="absolute inset-0 bg-sa-green-deep/60" onClick={onClose} />
+      <div className="relative bg-sa-cream-soft rounded-sa-lg shadow-sa w-full max-w-sm">
+        <div className="px-5 py-4 border-b border-sa-green-ink/10 flex items-center justify-between">
+          <h3 className="font-display text-2xl text-sa-green-ink">Buscar cliente</h3>
           {clienteActivo && (
-            <button onClick={quitarCliente} className="text-red-500 text-xs font-medium hover:text-red-700">
-              Quitar cliente
+            <button
+              onClick={quitarCliente}
+              className="font-mono text-xs uppercase tracking-wide text-sa-strawberry hover:brightness-110"
+            >
+              Quitar
             </button>
           )}
         </div>
@@ -61,41 +64,57 @@ export function ModalCliente({ open, onClose }: Props) {
             type="text"
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
-            placeholder="Nombre o teléfono..."
-            className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+            placeholder="Nombre o teléfono…"
+            className="w-full px-4 py-3 bg-white border border-sa-green-ink/10 rounded-sa font-body text-sm text-sa-green-ink placeholder:font-mono placeholder:text-sa-green-ink/40 focus:outline-none focus:ring-2 focus:ring-sa-green/30"
             autoFocus
           />
         </div>
 
-        <div className="max-h-60 overflow-y-auto divide-y divide-gray-50 px-2 pb-4">
+        <div className="max-h-60 overflow-y-auto px-3 pb-4 space-y-2">
           {clientesFiltrados.length === 0 ? (
-            <p className="text-center text-gray-400 text-sm py-6">Sin resultados</p>
+            <p className="text-center font-mono text-sm uppercase tracking-wide text-sa-green-ink/40 py-6">
+              Sin resultados
+            </p>
           ) : (
             clientesFiltrados.map((c) => (
               <button
                 key={c.id}
                 onClick={() => seleccionarCliente(c)}
-                className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-50 transition-colors text-left ${
-                  clienteActivo?.id === c.id ? 'bg-orange-50' : ''
+                className={`w-full flex items-center gap-3 px-3 py-3 rounded-sa transition-colors text-left ${
+                  clienteActivo?.id === c.id
+                    ? 'bg-white border-2 border-sa-green'
+                    : 'bg-sa-cream-warm/60 hover:bg-white border-2 border-transparent'
                 }`}
               >
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                <div className="w-12 h-12 rounded-full bg-sa-green flex items-center justify-center text-sa-cream font-display text-xl flex-shrink-0">
                   {c.nombre[0]}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className="font-medium text-gray-900 text-sm">{c.nombre}</p>
-                    <span className={`text-xs px-1.5 py-0.5 rounded-full capitalize font-medium ${NIVEL_COLOR[c.nivel] ?? ''}`}>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="font-display text-base text-sa-green-ink leading-tight">
+                      {c.nombre}
+                    </p>
+                    <span
+                      className={`font-mono text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full border ${
+                        NIVEL_COLOR[c.nivel] ?? ''
+                      }`}
+                    >
                       {c.nivel}
                     </span>
                   </div>
-                  <div className="flex gap-3 text-xs text-gray-400 mt-0.5">
-                    <span>⭐ {c.puntos} pts</span>
-                    {c.wallet_saldo > 0 && <span>💰 ${c.wallet_saldo.toFixed(2)}</span>}
+                  <div className="flex gap-3 mt-1">
+                    <span className="font-mono text-xs text-sa-green-ink/60">
+                      ⭐ {c.puntos} pts
+                    </span>
+                    {c.wallet_saldo > 0 && (
+                      <span className="font-mono text-xs text-sa-blueberry">
+                        💰 ${c.wallet_saldo.toFixed(2)}
+                      </span>
+                    )}
                   </div>
                 </div>
                 {clienteActivo?.id === c.id && (
-                  <span className="text-orange-500 text-sm flex-shrink-0">✓</span>
+                  <span className="text-sa-green text-lg flex-shrink-0">✓</span>
                 )}
               </button>
             ))

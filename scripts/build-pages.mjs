@@ -15,6 +15,7 @@ const apps = [
   { name: 'admin',            emoji: '👑', title: 'Admin',            lede: 'CEO · Dashboard, menú, inventario, reportes', tint: 'sa-banana' },
   { name: 'cocina-alimentos', emoji: '🍳', title: 'Cocina Alimentos', lede: 'KDS · cocina caliente',        tint: 'sa-mango' },
   { name: 'cocina-bebidas',   emoji: '🥤', title: 'Cocina Bebidas',   lede: 'KDS · barra',                  tint: 'sa-blueberry' },
+  { name: 'cliente-display',  emoji: '📺', title: 'Cliente Display',  lede: 'Pantalla para el cliente · BroadcastChannel', tint: 'sa-mint' },
 ]
 
 if (existsSync(out)) rmSync(out, { recursive: true })

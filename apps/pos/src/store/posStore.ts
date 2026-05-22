@@ -1,5 +1,12 @@
 import { create } from 'zustand'
-import type { ItemOrdenPOS, ClientePOS, PagoItem } from '../types'
+import type { ItemOrdenPOS, ClientePOS } from '../types'
+import { publish } from '../display/sync'
+
+export interface PromoAplicada {
+  promo: { id: string; nombre: string }
+  descuento: number
+  razon: string
+}
 
 interface PosStore {
   // Sesión
@@ -12,6 +19,8 @@ interface PosStore {
   clienteActivo: ClientePOS | null
   descuento: { tipo: 'porcentaje' | 'monto'; valor: number } | null
   notas: string
+  codigoPromo: string
+  promocionesAplicadas: PromoAplicada[]
 
   // Acciones de sesión
   iniciarSesion: (empleado: { id: string; nombre: string; rol: string }, turnoId: string) => void
@@ -26,11 +35,15 @@ interface PosStore {
   setCliente: (cliente: ClientePOS | null) => void
   setDescuento: (descuento: { tipo: 'porcentaje' | 'monto'; valor: number } | null) => void
   setNotas: (notas: string) => void
+  setCodigoPromo: (codigo: string) => void
+  setPromocionesAplicadas: (promos: PromoAplicada[]) => void
   limpiarOrden: () => void
+  marcarPagado: (folio: string) => void
 
   // Cálculos
   subtotal: () => number
   montoDescuento: () => number
+  montoPromos: () => number
   total: () => number
   totalItems: () => number
 }
@@ -43,44 +56,89 @@ export const usePosStore = create<PosStore>((set, get) => ({
   clienteActivo: null,
   descuento: null,
   notas: '',
+  codigoPromo: '',
+  promocionesAplicadas: [],
 
   iniciarSesion: (empleado, turnoId) =>
     set({ empleadoActivo: empleado, turnoId }),
 
   cerrarSesion: () =>
-    set({ empleadoActivo: null, turnoId: null, items: [], clienteActivo: null, descuento: null }),
+    set({
+      empleadoActivo: null,
+      turnoId: null,
+      items: [],
+      clienteActivo: null,
+      descuento: null,
+      codigoPromo: '',
+      promocionesAplicadas: [],
+    }),
 
   agregarItem: (item) =>
     set((state) => {
       const existe = state.items.find((i) => i.producto_id === item.producto_id)
-      if (existe) {
-        return {
-          items: state.items.map((i) =>
+      const newItems: ItemOrdenPOS[] = existe
+        ? state.items.map((i) =>
             i.producto_id === item.producto_id ? { ...i, cantidad: i.cantidad + 1 } : i,
-          ),
-        }
-      }
-      return { items: [...state.items, { ...item, cantidad: 1 }] }
+          )
+        : [...state.items, { ...item, cantidad: 1 }]
+
+      const updated = newItems.find((i) => i.producto_id === item.producto_id)!
+      publish({
+        type: 'item-added',
+        item: { id: updated.producto_id, nombre: updated.nombre, cantidad: updated.cantidad, precio: updated.precio },
+        total: newItems.reduce((s, i) => s + i.precio * i.cantidad, 0),
+        totalItems: newItems.reduce((s, i) => s + i.cantidad, 0),
+      })
+      return { items: newItems }
     }),
 
   quitarItem: (producto_id) =>
-    set((state) => ({ items: state.items.filter((i) => i.producto_id !== producto_id) })),
+    set((state) => {
+      const newItems = state.items.filter((i) => i.producto_id !== producto_id)
+      publish({
+        type: 'item-removed',
+        id: producto_id,
+        total: newItems.reduce((s, i) => s + i.precio * i.cantidad, 0),
+        totalItems: newItems.reduce((s, i) => s + i.cantidad, 0),
+      })
+      return { items: newItems }
+    }),
 
   incrementar: (producto_id) =>
-    set((state) => ({
-      items: state.items.map((i) =>
+    set((state) => {
+      const newItems = state.items.map((i) =>
         i.producto_id === producto_id ? { ...i, cantidad: i.cantidad + 1 } : i,
-      ),
-    })),
+      )
+      const updated = newItems.find((i) => i.producto_id === producto_id)!
+      publish({
+        type: 'item-added',
+        item: { id: updated.producto_id, nombre: updated.nombre, cantidad: updated.cantidad, precio: updated.precio },
+        total: newItems.reduce((s, i) => s + i.precio * i.cantidad, 0),
+        totalItems: newItems.reduce((s, i) => s + i.cantidad, 0),
+      })
+      return { items: newItems }
+    }),
 
   decrementar: (producto_id) =>
-    set((state) => ({
-      items: state.items
+    set((state) => {
+      const newItems = state.items
         .map((i) =>
           i.producto_id === producto_id ? { ...i, cantidad: i.cantidad - 1 } : i,
         )
-        .filter((i) => i.cantidad > 0),
-    })),
+        .filter((i) => i.cantidad > 0)
+      const totalItems = newItems.reduce((s, i) => s + i.cantidad, 0)
+      if (totalItems === 0) {
+        publish({ type: 'cart-cleared' })
+      } else {
+        publish({
+          type: 'item-removed',
+          id: producto_id,
+          total: newItems.reduce((s, i) => s + i.precio * i.cantidad, 0),
+          totalItems,
+        })
+      }
+      return { items: newItems }
+    }),
 
   setPersonalizacion: (producto_id, texto) =>
     set((state) => ({
@@ -95,8 +153,33 @@ export const usePosStore = create<PosStore>((set, get) => ({
 
   setNotas: (notas) => set({ notas }),
 
-  limpiarOrden: () =>
-    set({ items: [], clienteActivo: null, descuento: null, notas: '' }),
+  setCodigoPromo: (codigoPromo) => set({ codigoPromo }),
+
+  setPromocionesAplicadas: (promocionesAplicadas) => set({ promocionesAplicadas }),
+
+  limpiarOrden: () => {
+    publish({ type: 'cart-cleared' })
+    set({
+      items: [],
+      clienteActivo: null,
+      descuento: null,
+      notas: '',
+      codigoPromo: '',
+      promocionesAplicadas: [],
+    })
+  },
+
+  marcarPagado: (folio) => {
+    publish({ type: 'order-paid', folio })
+    set({
+      items: [],
+      clienteActivo: null,
+      descuento: null,
+      notas: '',
+      codigoPromo: '',
+      promocionesAplicadas: [],
+    })
+  },
 
   subtotal: () =>
     get().items.reduce((sum, i) => sum + i.precio * i.cantidad, 0),
@@ -109,7 +192,10 @@ export const usePosStore = create<PosStore>((set, get) => ({
     return Math.min(descuento.valor, sub)
   },
 
-  total: () => get().subtotal() - get().montoDescuento(),
+  montoPromos: () =>
+    get().promocionesAplicadas.reduce((sum, p) => sum + p.descuento, 0),
+
+  total: () => Math.max(0, get().subtotal() - get().montoDescuento() - get().montoPromos()),
 
   totalItems: () => get().items.reduce((sum, i) => sum + i.cantidad, 0),
 }))

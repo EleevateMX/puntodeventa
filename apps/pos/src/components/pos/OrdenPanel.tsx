@@ -11,11 +11,24 @@ export function OrdenPanel({ onCobrar }: Props) {
   const {
     items, incrementar, decrementar, quitarItem,
     clienteActivo, descuento, setDescuento,
-    subtotal, montoDescuento, total, totalItems, limpiarOrden,
+    subtotal, montoDescuento, montoPromos, total, totalItems, limpiarOrden,
+    codigoPromo, setCodigoPromo, promocionesAplicadas,
   } = usePosStore()
 
   const [modalDescuento, setModalDescuento] = useState(false)
   const [modalCliente, setModalCliente] = useState(false)
+  const [inputPromo, setInputPromo] = useState('')
+
+  function aplicarPromo() {
+    if (inputPromo.trim()) {
+      setCodigoPromo(inputPromo.trim())
+      setInputPromo('')
+    }
+  }
+
+  function quitarPromo() {
+    setCodigoPromo('')
+  }
 
   return (
     <div className="flex flex-col h-full">
@@ -129,6 +142,50 @@ export function OrdenPanel({ onCobrar }: Props) {
             </button>
           </div>
 
+          {/* Promo code input */}
+          <div className="px-4 pb-2">
+            {codigoPromo ? (
+              <div className="flex items-center gap-2 bg-sa-green/10 border border-sa-green/30 rounded-full px-3 py-1.5">
+                <span className="font-mono text-xs text-sa-green-ink flex-1">🎟️ {codigoPromo}</span>
+                <button
+                  onClick={quitarPromo}
+                  className="text-sa-strawberry/70 hover:text-sa-strawberry text-xs"
+                >
+                  ✕
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={inputPromo}
+                  onChange={(e) => setInputPromo(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && aplicarPromo()}
+                  placeholder="Código promo…"
+                  className="flex-1 px-3 py-1.5 bg-white border border-sa-green-ink/10 rounded-full font-mono text-xs text-sa-green-ink focus:outline-none focus:ring-2 focus:ring-sa-green/30"
+                />
+                <button
+                  onClick={aplicarPromo}
+                  className="px-3 py-1.5 bg-sa-green text-sa-cream rounded-full font-mono text-xs uppercase tracking-wide hover:bg-sa-green-deep"
+                >
+                  Aplicar
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Applied promos */}
+          {promocionesAplicadas.length > 0 && (
+            <div className="px-4 pb-2 space-y-1">
+              {promocionesAplicadas.map((p) => (
+                <div key={p.promo.id} className="flex items-center justify-between bg-sa-green/10 border border-sa-green/20 rounded-sa px-3 py-1.5">
+                  <span className="font-mono text-xs text-sa-green-ink truncate flex-1 mr-2">🎟️ {p.razon}</span>
+                  <span className="font-mono text-xs text-sa-green flex-shrink-0">−${p.descuento.toFixed(2)}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
           {/* Totals */}
           <div className="px-5 py-3 space-y-1.5">
             <div className="flex justify-between text-sm">
@@ -139,6 +196,12 @@ export function OrdenPanel({ onCobrar }: Props) {
               <div className="flex justify-between text-sm">
                 <span className="text-sa-strawberry">Descuento</span>
                 <span className="font-mono text-sa-strawberry">−${montoDescuento().toFixed(2)}</span>
+              </div>
+            )}
+            {montoPromos() > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-sa-green">Promos</span>
+                <span className="font-mono text-sa-green">−${montoPromos().toFixed(2)}</span>
               </div>
             )}
             {clienteActivo && (

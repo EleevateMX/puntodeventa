@@ -13,9 +13,15 @@ const METODOS: { key: MetodoPago; label: string; icon: string }[] = [
 
 const CAMBIO_RAPIDO = [50, 100, 200, 500]
 
+const DEMO_GC = [
+  { codigo: 'GIFT-2024', saldo: 150 },
+  { codigo: 'GIFT-PROMO', saldo: 50 },
+  { codigo: 'GIFT-BDAY', saldo: 200 },
+]
+
 export function Cobro() {
   const navigate = useNavigate()
-  const { total, clienteActivo, limpiarOrden, items } = usePosStore()
+  const { total, clienteActivo, marcarPagado, items, montoDescuento, montoPromos, promocionesAplicadas } = usePosStore()
 
   const [modo, setModo] = useState<'simple' | 'mixto'>('simple')
   const [metodoPrincipal, setMetodoPrincipal] = useState<MetodoPago>('efectivo')
@@ -24,17 +30,54 @@ export function Cobro() {
   const [montoPago, setMontoPago] = useState('')
   const [procesando, setProcesando] = useState(false)
 
+  // Wallet local state
+  const [usarWallet, setUsarWallet] = useState(false)
+
+  // Gift card local state
+  const [gcExpandido, setGcExpandido] = useState(false)
+  const [gcCodigo, setGcCodigo] = useState('')
+  const [gcDescuento, setGcDescuento] = useState(0)
+  const [gcError, setGcError] = useState('')
+  const [gcAplicada, setGcAplicada] = useState<{ codigo: string; saldo: number } | null>(null)
+
   const totalOrden = total()
+  const walletDisponible = clienteActivo?.wallet_saldo ?? 0
+  const walletUsado = usarWallet ? Math.min(walletDisponible, totalOrden) : 0
+  const restanteConDescuentos = Math.max(0, totalOrden - walletUsado - gcDescuento)
+
   const recibidoNum = parseFloat(recibido) || 0
-  const cambio = recibidoNum - totalOrden
+  const cambio = recibidoNum - restanteConDescuentos
 
   const totalPagado = pagos.reduce((s, p) => s + p.monto, 0)
-  const restante = Math.max(0, totalOrden - totalPagado)
+  const restanteMixto = Math.max(0, restanteConDescuentos - totalPagado)
+
+  function aplicarGiftCard() {
+    const found = DEMO_GC.find((g) => g.codigo === gcCodigo.trim().toUpperCase())
+    if (!found) {
+      setGcError('Gift Card no encontrada')
+      return
+    }
+    if (found.saldo <= 0) {
+      setGcError('Gift Card sin saldo')
+      return
+    }
+    const descuento = Math.min(found.saldo, totalOrden)
+    setGcDescuento(descuento)
+    setGcAplicada({ codigo: found.codigo, saldo: found.saldo })
+    setGcError('')
+  }
+
+  function quitarGiftCard() {
+    setGcDescuento(0)
+    setGcAplicada(null)
+    setGcCodigo('')
+    setGcError('')
+  }
 
   function agregarPago(metodo: MetodoPago) {
-    const monto = parseFloat(montoPago) || restante
+    const monto = parseFloat(montoPago) || restanteMixto
     if (monto <= 0) return
-    setPagos((prev) => [...prev, { metodo, monto: Math.min(monto, restante) }])
+    setPagos((prev) => [...prev, { metodo, monto: Math.min(monto, restanteMixto) }])
     setMontoPago('')
   }
 
@@ -42,14 +85,15 @@ export function Cobro() {
     setProcesando(true)
     // TODO: Insert orden + orden_items + orden_pagos to Supabase
     await new Promise((r) => setTimeout(r, 800))
-    limpiarOrden()
+    const folio = `A-${Date.now().toString(36).slice(-4).toUpperCase()}`
+    marcarPagado(folio)
     navigate('/')
     setProcesando(false)
   }
 
-  const listo = modo === 'simple'
-    ? (metodoPrincipal !== 'efectivo' || recibidoNum >= totalOrden)
-    : totalPagado >= totalOrden
+  const listoSimple = restanteConDescuentos <= 0
+    || (metodoPrincipal !== 'efectivo' || recibidoNum >= restanteConDescuentos)
+  const listo = modo === 'simple' ? listoSimple : totalPagado >= restanteConDescuentos
 
   return (
     <div className="h-screen flex flex-col bg-sa-cream-paper overflow-hidden">
@@ -135,8 +179,8 @@ export function Cobro() {
               </div>
 
               {/* Cash received */}
-              {metodoPrincipal === 'efectivo' && (
-                <div className="bg-white rounded-sa p-5 shadow-sa-sm">
+              {metodoPrincipal === 'efectivo' && restanteConDescuentos > 0 && (
+                <div className="bg-white rounded-sa p-5 shadow-sa-sm mb-4">
                   <label className="block font-mono text-xs uppercase tracking-wide text-sa-green-ink/60 mb-2">
                     Recibido
                   </label>
@@ -146,13 +190,13 @@ export function Cobro() {
                       type="number"
                       value={recibido}
                       onChange={(e) => setRecibido(e.target.value)}
-                      placeholder={totalOrden.toFixed(2)}
+                      placeholder={restanteConDescuentos.toFixed(2)}
                       className="w-full pl-10 pr-4 py-3 bg-sa-cream-soft border border-sa-green-ink/10 rounded-sa font-mono text-2xl text-sa-green-ink focus:outline-none focus:ring-2 focus:ring-sa-green/30"
                     />
                   </div>
                   {/* Quick amount buttons */}
                   <div className="flex gap-2 mb-3">
-                    {CAMBIO_RAPIDO.filter((v) => v >= totalOrden).slice(0, 4).map((v) => (
+                    {CAMBIO_RAPIDO.filter((v) => v >= restanteConDescuentos).slice(0, 4).map((v) => (
                       <button
                         key={v}
                         onClick={() => setRecibido(String(v))}
@@ -162,13 +206,13 @@ export function Cobro() {
                       </button>
                     ))}
                     <button
-                      onClick={() => setRecibido(totalOrden.toFixed(2))}
+                      onClick={() => setRecibido(restanteConDescuentos.toFixed(2))}
                       className="flex-1 py-2.5 bg-sa-banana/40 hover:bg-sa-banana rounded-full font-mono text-sm text-sa-green-ink transition-colors"
                     >
                       Exacto
                     </button>
                   </div>
-                  {recibidoNum >= totalOrden && (
+                  {recibidoNum >= restanteConDescuentos && (
                     <div className="flex justify-between items-center bg-sa-mint/25 rounded-sa px-4 py-3 border border-sa-mint/50">
                       <span className="font-mono text-sm uppercase tracking-wide text-sa-green-ink/70">
                         Cambio
@@ -183,13 +227,13 @@ export function Cobro() {
             </>
           ) : (
             /* Mixed payment mode */
-            <div className="bg-white rounded-sa p-5 shadow-sa-sm">
+            <div className="bg-white rounded-sa p-5 shadow-sa-sm mb-4">
               <div className="flex items-center justify-between mb-3">
                 <p className="font-mono text-xs uppercase tracking-wide text-sa-green-ink/60">
                   Pagos registrados
                 </p>
                 <p className="font-mono text-sm text-sa-green-ink/60">
-                  Pendiente: <span className="font-bold text-sa-strawberry">${restante.toFixed(2)}</span>
+                  Pendiente: <span className="font-bold text-sa-strawberry">${restanteMixto.toFixed(2)}</span>
                 </p>
               </div>
 
@@ -210,13 +254,13 @@ export function Cobro() {
               ))}
 
               {/* Add payment */}
-              {restante > 0 && (
+              {restanteMixto > 0 && (
                 <div className="mt-4 space-y-3">
                   <input
                     type="number"
                     value={montoPago}
                     onChange={(e) => setMontoPago(e.target.value)}
-                    placeholder={`Monto (máx $${restante.toFixed(2)})`}
+                    placeholder={`Monto (máx $${restanteMixto.toFixed(2)})`}
                     className="w-full px-4 py-2.5 bg-sa-cream-soft border border-sa-green-ink/10 rounded-sa font-mono text-sm focus:outline-none focus:ring-2 focus:ring-sa-green/30"
                   />
                   <div className="grid grid-cols-5 gap-2">
@@ -233,6 +277,94 @@ export function Cobro() {
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Wallet toggle */}
+          {clienteActivo && walletDisponible > 0 && (
+            <div className="bg-white rounded-sa p-4 shadow-sa-sm mb-3">
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-sm text-sa-green-ink">
+                  💰 Pagar con Wallet · ${walletDisponible.toFixed(2)} disponibles
+                </span>
+                <button
+                  onClick={() => setUsarWallet((v) => !v)}
+                  className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ${
+                    usarWallet ? 'bg-sa-green' : 'bg-sa-green-ink/20'
+                  }`}
+                >
+                  <span
+                    className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
+                      usarWallet ? 'translate-x-5' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </div>
+              {usarWallet && walletUsado > 0 && (
+                <p className="font-mono text-xs text-sa-green-ink/60 mt-2">
+                  Restante a cobrar: <span className="font-bold text-sa-green-ink">${restanteConDescuentos.toFixed(2)}</span>
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Gift card collapsible */}
+          {clienteActivo && (
+            <div className="bg-white rounded-sa shadow-sa-sm mb-3">
+              <button
+                onClick={() => setGcExpandido((v) => !v)}
+                className="w-full flex items-center justify-between px-4 py-3 font-mono text-sm text-sa-green-ink/70"
+              >
+                <span>🎁 ¿Tiene Gift Card?</span>
+                <span className="text-xs">{gcExpandido ? '▲' : '▼'}</span>
+              </button>
+              {gcExpandido && (
+                <div className="px-4 pb-4">
+                  {gcAplicada ? (
+                    <div className="flex items-center justify-between bg-sa-mint/20 rounded-sa px-3 py-2 border border-sa-mint/40">
+                      <span className="font-mono text-sm text-sa-green-ink">
+                        Gift Card aplicada · −${gcDescuento.toFixed(2)}
+                      </span>
+                      <button
+                        onClick={quitarGiftCard}
+                        className="text-sa-strawberry/70 hover:text-sa-strawberry text-xs ml-2"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={gcCodigo}
+                          onChange={(e) => { setGcCodigo(e.target.value); setGcError('') }}
+                          placeholder="Código gift card"
+                          className="flex-1 px-3 py-2 bg-sa-cream-soft border border-sa-green-ink/10 rounded-sa font-mono text-sm text-sa-green-ink focus:outline-none focus:ring-2 focus:ring-sa-green/30"
+                        />
+                        <button
+                          onClick={aplicarGiftCard}
+                          className="px-4 py-2 bg-sa-green text-sa-cream rounded-sa font-mono text-xs uppercase tracking-wide hover:bg-sa-green-deep"
+                        >
+                          Aplicar
+                        </button>
+                      </div>
+                      {gcError && (
+                        <p className="font-mono text-xs text-sa-strawberry mt-1.5">{gcError}</p>
+                      )}
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Puntos a ganar */}
+          {clienteActivo && (
+            <div className="bg-sa-green/10 border border-sa-green/30 rounded-sa px-4 py-2.5 mb-4">
+              <p className="font-mono text-xs text-sa-green-ink leading-tight">
+                ⭐ {clienteActivo.nombre} ganará ~{Math.floor(totalOrden / 10)} puntos con esta compra
+              </p>
             </div>
           )}
         </div>
@@ -252,10 +384,34 @@ export function Cobro() {
               </div>
             ))}
           </div>
-          <div className="border-t border-sa-green-ink/15 pt-3 space-y-1 mb-4">
-            <div className="flex justify-between items-baseline">
+          <div className="border-t border-sa-green-ink/15 pt-3 space-y-1 mb-4 font-mono text-sm">
+            {montoDescuento() > 0 && (
+              <div className="flex justify-between text-sa-strawberry">
+                <span>Descuento manual</span>
+                <span>−${montoDescuento().toFixed(2)}</span>
+              </div>
+            )}
+            {montoPromos() > 0 && promocionesAplicadas.map((p) => (
+              <div key={p.promo.id} className="flex justify-between text-sa-green">
+                <span className="truncate flex-1 mr-2">🎟️ {p.razon}</span>
+                <span className="flex-shrink-0">−${p.descuento.toFixed(2)}</span>
+              </div>
+            ))}
+            {gcDescuento > 0 && (
+              <div className="flex justify-between text-sa-green">
+                <span>🎁 Gift Card</span>
+                <span>−${gcDescuento.toFixed(2)}</span>
+              </div>
+            )}
+            {usarWallet && walletUsado > 0 && (
+              <div className="flex justify-between text-sa-blueberry">
+                <span>💰 Wallet</span>
+                <span>−${walletUsado.toFixed(2)}</span>
+              </div>
+            )}
+            <div className="flex justify-between items-baseline pt-2 border-t border-sa-green-ink/10">
               <span className="font-display text-xl text-sa-green-ink">Total</span>
-              <span className="font-display text-2xl text-sa-green-ink">${totalOrden.toFixed(2)}</span>
+              <span className="font-display text-2xl text-sa-green-ink">${restanteConDescuentos.toFixed(2)}</span>
             </div>
           </div>
           <button

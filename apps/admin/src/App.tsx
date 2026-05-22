@@ -6,12 +6,14 @@ import { Inventario } from './pages/Inventario'
 import { Ventas } from './pages/Ventas'
 import { Roles } from './pages/Roles'
 import { Promociones } from './pages/Promociones'
+import { Lealtad } from './pages/Lealtad'
 
 const navItems = [
   { to: '/dashboard', label: 'Dashboard', icon: '📊' },
   { to: '/menu', label: 'Menú', icon: '🍽️' },
   { to: '/inventario', label: 'Inventario', icon: '📦' },
   { to: '/promociones', label: 'Promociones', icon: '🎟️' },
+  { to: '/lealtad', label: 'Lealtad', icon: '⭐' },
   { to: '/ventas', label: 'Ventas', icon: '💰' },
   { to: '/roles', label: 'Empleados', icon: '👥' },
 ]
@@ -62,6 +64,7 @@ export default function App() {
           <Route path="/menu" element={<Menu />} />
           <Route path="/inventario" element={<Inventario />} />
           <Route path="/promociones" element={<Promociones />} />
+          <Route path="/lealtad" element={<Lealtad />} />
           <Route path="/ventas" element={<Ventas />} />
           <Route path="/roles" element={<Roles />} />
         </Routes>

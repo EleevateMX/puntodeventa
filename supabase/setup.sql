@@ -673,11 +673,17 @@ language sql stable as $$
 $$;
 
 -- ─── 9. DATOS SEMILLA — Shake Aholic ─────────────────────────────────────────
+-- Todos los UUIDs usan solo caracteres hex válidos (0-9, a-f)
+-- Esquema de IDs:
+--   0001-xxxx = cocinas       0002-xxxx = almacenes
+--   0003-xxxx = categorias    0004-xxxx = productos
+--   0005-xxxx = insumos       0006-xxxx = usuarios
+--   0007-xxxx = empleados     0008-xxxx = clientes
 
 -- Cocinas
 insert into cocinas (id, nombre, slug) values
-  ('c0c1na01-0000-0000-0000-000000000001', 'Alimentos', 'alimentos'),
-  ('c0c1na01-0000-0000-0000-000000000002', 'Bebidas',   'bebidas')
+  ('00000000-0000-0000-0001-000000000001', 'Alimentos', 'alimentos'),
+  ('00000000-0000-0000-0001-000000000002', 'Bebidas',   'bebidas')
 on conflict (slug) do nothing;
 
 -- Sucursal principal
@@ -688,9 +694,8 @@ on conflict (id) do nothing;
 
 -- Almacenes
 insert into almacenes (id, nombre, tipo, sucursal_id) values
-  ('a1macen0-0000-0000-0000-000000000001', 'Almacén Central', 'central', null),
-  ('a1macen0-0000-0000-0000-000000000002', 'Almacén Sucursal Principal', 'sucursal',
-   '00000000-0000-0000-0000-000000000001')
+  ('00000000-0000-0000-0002-000000000001', 'Almacén Central',             'central',  null),
+  ('00000000-0000-0000-0002-000000000002', 'Almacén Sucursal Principal',  'sucursal', '00000000-0000-0000-0000-000000000001')
 on conflict (id) do nothing;
 
 -- Plataformas delivery
@@ -702,108 +707,108 @@ on conflict (slug) do nothing;
 
 -- Categorías Bebidas
 insert into categorias (id, nombre, cocina_id, activa) values
-  ('ca7be001-0000-0000-0000-000000000001', 'Shakes',   'c0c1na01-0000-0000-0000-000000000002', true),
-  ('ca7be001-0000-0000-0000-000000000002', 'Café',     'c0c1na01-0000-0000-0000-000000000002', true),
-  ('ca7be001-0000-0000-0000-000000000003', 'Agua & Naturales', 'c0c1na01-0000-0000-0000-000000000002', true)
+  ('00000000-0000-0000-0003-000000000001', 'Shakes',          '00000000-0000-0000-0001-000000000002', true),
+  ('00000000-0000-0000-0003-000000000002', 'Café',            '00000000-0000-0000-0001-000000000002', true),
+  ('00000000-0000-0000-0003-000000000003', 'Agua & Naturales','00000000-0000-0000-0001-000000000002', true)
 on conflict (id) do nothing;
 
 -- Categorías Alimentos
 insert into categorias (id, nombre, cocina_id, activa) values
-  ('ca7be001-0000-0000-0000-000000000004', 'Bowls',  'c0c1na01-0000-0000-0000-000000000001', true),
-  ('ca7be001-0000-0000-0000-000000000005', 'Snacks', 'c0c1na01-0000-0000-0000-000000000001', true)
+  ('00000000-0000-0000-0003-000000000004', 'Bowls',  '00000000-0000-0000-0001-000000000001', true),
+  ('00000000-0000-0000-0003-000000000005', 'Snacks', '00000000-0000-0000-0001-000000000001', true)
 on conflict (id) do nothing;
 
--- Productos: Shakes
+-- Productos: Shakes (bebidas)
 insert into productos (id, nombre, descripcion, precio, categoria_id, activo) values
-  ('prod0001-0000-0000-0000-000000000001', 'Shake Fresa Power',
+  ('00000000-0000-0000-0004-000000000001', 'Shake Fresa Power',
    'Proteína de suero, fresa, leche y hielo', 85.00,
-   'ca7be001-0000-0000-0000-000000000001', true),
-  ('prod0001-0000-0000-0000-000000000002', 'Shake Mango Boost',
+   '00000000-0000-0000-0003-000000000001', true),
+  ('00000000-0000-0000-0004-000000000002', 'Shake Mango Boost',
    'Proteína, mango, leche de coco y jengibre', 85.00,
-   'ca7be001-0000-0000-0000-000000000001', true),
-  ('prod0001-0000-0000-0000-000000000003', 'Shake Vainilla Proteína',
+   '00000000-0000-0000-0003-000000000001', true),
+  ('00000000-0000-0000-0004-000000000003', 'Shake Vainilla Proteína',
    'Proteína de vainilla, leche, plátano y miel', 80.00,
-   'ca7be001-0000-0000-0000-000000000001', true),
-  ('prod0001-0000-0000-0000-000000000004', 'Shake Chocolate',
+   '00000000-0000-0000-0003-000000000001', true),
+  ('00000000-0000-0000-0004-000000000004', 'Shake Chocolate',
    'Proteína de chocolate, cacao, leche y avena', 90.00,
-   'ca7be001-0000-0000-0000-000000000001', true),
-  ('prod0001-0000-0000-0000-000000000005', 'Shake Verde Detox',
+   '00000000-0000-0000-0003-000000000001', true),
+  ('00000000-0000-0000-0004-000000000005', 'Shake Verde Detox',
    'Espinaca, manzana verde, pepino, jengibre y limón', 90.00,
-   'ca7be001-0000-0000-0000-000000000001', true)
+   '00000000-0000-0000-0003-000000000001', true)
 on conflict (id) do nothing;
 
--- Productos: Café
+-- Productos: Café (bebidas)
 insert into productos (id, nombre, descripcion, precio, categoria_id, activo) values
-  ('prod0001-0000-0000-0000-000000000006', 'Café Frío Mocha',
+  ('00000000-0000-0000-0004-000000000006', 'Café Frío Mocha',
    'Cold brew con leche, sirope de chocolate y hielo', 65.00,
-   'ca7be001-0000-0000-0000-000000000002', true),
-  ('prod0001-0000-0000-0000-000000000007', 'Café Americano',
+   '00000000-0000-0000-0003-000000000002', true),
+  ('00000000-0000-0000-0004-000000000007', 'Café Americano',
    'Café de grano 100% arabica, recién molido', 45.00,
-   'ca7be001-0000-0000-0000-000000000002', true),
-  ('prod0001-0000-0000-0000-000000000008', 'Matcha Latte',
+   '00000000-0000-0000-0003-000000000002', true),
+  ('00000000-0000-0000-0004-000000000008', 'Matcha Latte',
    'Matcha ceremonial con leche de avena', 70.00,
-   'ca7be001-0000-0000-0000-000000000002', true)
+   '00000000-0000-0000-0003-000000000002', true)
 on conflict (id) do nothing;
 
--- Productos: Agua & Naturales
+-- Productos: Agua & Naturales (bebidas)
 insert into productos (id, nombre, descripcion, precio, categoria_id, activo) values
-  ('prod0001-0000-0000-0000-000000000009', 'Agua Purificada 500ml',
+  ('00000000-0000-0000-0004-000000000009', 'Agua Purificada 500ml',
    'Agua fría en botella', 20.00,
-   'ca7be001-0000-0000-0000-000000000003', true),
-  ('prod0001-0000-0000-0000-00000000000a', 'Agua Mineral 355ml',
+   '00000000-0000-0000-0003-000000000003', true),
+  ('00000000-0000-0000-0004-000000000010', 'Agua Mineral 355ml',
    'Agua mineral con gas', 25.00,
-   'ca7be001-0000-0000-0000-000000000003', true)
+   '00000000-0000-0000-0003-000000000003', true)
 on conflict (id) do nothing;
 
--- Productos: Bowls
+-- Productos: Bowls (alimentos)
 insert into productos (id, nombre, descripcion, precio, categoria_id, activo) values
-  ('prod0001-0000-0000-0000-00000000000b', 'Bowl Banana + Granola',
+  ('00000000-0000-0000-0004-000000000011', 'Bowl Banana + Granola',
    'Plátano, granola casera, miel y semillas', 110.00,
-   'ca7be001-0000-0000-0000-000000000004', true),
-  ('prod0001-0000-0000-0000-00000000000c', 'Bowl Açaí Power',
+   '00000000-0000-0000-0003-000000000004', true),
+  ('00000000-0000-0000-0004-000000000012', 'Bowl Açaí Power',
    'Açaí, granola, fresa, plátano y miel de agave', 125.00,
-   'ca7be001-0000-0000-0000-000000000004', true),
-  ('prod0001-0000-0000-0000-00000000000d', 'Bowl Tropical',
+   '00000000-0000-0000-0003-000000000004', true),
+  ('00000000-0000-0000-0004-000000000013', 'Bowl Tropical',
    'Mango, piña, coco rallado, granola y chía', 115.00,
-   'ca7be001-0000-0000-0000-000000000004', true)
+   '00000000-0000-0000-0003-000000000004', true)
 on conflict (id) do nothing;
 
--- Productos: Snacks
+-- Productos: Snacks (alimentos)
 insert into productos (id, nombre, descripcion, precio, categoria_id, activo) values
-  ('prod0001-0000-0000-0000-00000000000e', 'Snack Choco-Avena',
+  ('00000000-0000-0000-0004-000000000014', 'Snack Choco-Avena',
    'Barra de avena con chips de chocolate', 35.00,
-   'ca7be001-0000-0000-0000-000000000005', true),
-  ('prod0001-0000-0000-0000-00000000000f', 'Snack Proteína Almendra',
+   '00000000-0000-0000-0003-000000000005', true),
+  ('00000000-0000-0000-0004-000000000015', 'Snack Proteína Almendra',
    'Barra de proteína con almendras y miel', 40.00,
-   'ca7be001-0000-0000-0000-000000000005', true),
-  ('prod0001-0000-0000-0000-000000000010', 'Energy Ball',
+   '00000000-0000-0000-0003-000000000005', true),
+  ('00000000-0000-0000-0004-000000000016', 'Energy Ball',
    'Bolitas de dátil, avena y coco', 30.00,
-   'ca7be001-0000-0000-0000-000000000005', true)
+   '00000000-0000-0000-0003-000000000005', true)
 on conflict (id) do nothing;
 
 -- Insumos principales
 insert into insumos (id, nombre, unidad, stock_actual, stock_minimo, costo_unitario) values
-  ('ins0001-0000-0000-0000-000000000001', 'Proteína de suero',  'kg',    5.0,  1.0, 350.00),
-  ('ins0001-0000-0000-0000-000000000002', 'Leche entera',       'litro', 15.0, 3.0,  22.00),
-  ('ins0001-0000-0000-0000-000000000003', 'Plátano',            'kg',    8.0,  2.0,  18.00),
-  ('ins0001-0000-0000-0000-000000000004', 'Fresa',              'kg',    6.0,  1.5,  45.00),
-  ('ins0001-0000-0000-0000-000000000005', 'Mango',              'kg',    7.0,  2.0,  30.00),
-  ('ins0001-0000-0000-0000-000000000006', 'Avena',              'kg',    4.0,  1.0,  35.00),
-  ('ins0001-0000-0000-0000-000000000007', 'Granola',            'kg',    3.0,  0.5,  80.00),
-  ('ins0001-0000-0000-0000-000000000008', 'Cacao en polvo',     'kg',    2.0,  0.5, 120.00),
-  ('ins0001-0000-0000-0000-000000000009', 'Espinaca',           'kg',    3.0,  0.5,  25.00),
-  ('ins0001-0000-0000-0000-00000000000a', 'Café molido',        'kg',    2.5,  0.5, 180.00),
-  ('ins0001-0000-0000-0000-00000000000b', 'Azúcar',             'kg',    5.0,  1.0,  20.00),
-  ('ins0001-0000-0000-0000-00000000000c', 'Hielo',              'kg',   20.0,  5.0,   3.00),
-  ('ins0001-0000-0000-0000-00000000000d', 'Açaí (pulpa)',       'kg',    2.0,  0.5, 220.00),
-  ('ins0001-0000-0000-0000-00000000000e', 'Almendra',           'kg',    1.5,  0.3, 280.00),
-  ('ins0001-0000-0000-0000-00000000000f', 'Leche de coco',      'litro', 4.0,  1.0,  55.00),
-  ('ins0001-0000-0000-0000-000000000010', 'Matcha en polvo',    'kg',    0.5,  0.1, 600.00)
+  ('00000000-0000-0000-0005-000000000001', 'Proteína de suero',  'kg',    5.0,  1.0, 350.00),
+  ('00000000-0000-0000-0005-000000000002', 'Leche entera',       'litro', 15.0, 3.0,  22.00),
+  ('00000000-0000-0000-0005-000000000003', 'Plátano',            'kg',    8.0,  2.0,  18.00),
+  ('00000000-0000-0000-0005-000000000004', 'Fresa',              'kg',    6.0,  1.5,  45.00),
+  ('00000000-0000-0000-0005-000000000005', 'Mango',              'kg',    7.0,  2.0,  30.00),
+  ('00000000-0000-0000-0005-000000000006', 'Avena',              'kg',    4.0,  1.0,  35.00),
+  ('00000000-0000-0000-0005-000000000007', 'Granola',            'kg',    3.0,  0.5,  80.00),
+  ('00000000-0000-0000-0005-000000000008', 'Cacao en polvo',     'kg',    2.0,  0.5, 120.00),
+  ('00000000-0000-0000-0005-000000000009', 'Espinaca',           'kg',    3.0,  0.5,  25.00),
+  ('00000000-0000-0000-0005-000000000010', 'Café molido',        'kg',    2.5,  0.5, 180.00),
+  ('00000000-0000-0000-0005-000000000011', 'Azúcar',             'kg',    5.0,  1.0,  20.00),
+  ('00000000-0000-0000-0005-000000000012', 'Hielo',              'kg',   20.0,  5.0,   3.00),
+  ('00000000-0000-0000-0005-000000000013', 'Açaí (pulpa)',       'kg',    2.0,  0.5, 220.00),
+  ('00000000-0000-0000-0005-000000000014', 'Almendra',           'kg',    1.5,  0.3, 280.00),
+  ('00000000-0000-0000-0005-000000000015', 'Leche de coco',      'litro', 4.0,  1.0,  55.00),
+  ('00000000-0000-0000-0005-000000000016', 'Matcha en polvo',    'kg',    0.5,  0.1, 600.00)
 on conflict (id) do nothing;
 
 -- Stock en almacén sucursal
 insert into inventario_stock (almacen_id, insumo_id, stock_actual, stock_minimo)
-select 'a1macen0-0000-0000-0000-000000000002', id, stock_actual, stock_minimo
+select '00000000-0000-0000-0002-000000000002', id, stock_actual, stock_minimo
 from insumos
 on conflict (almacen_id, insumo_id) do update
   set stock_actual = excluded.stock_actual,
@@ -811,35 +816,35 @@ on conflict (almacen_id, insumo_id) do update
 
 -- Usuarios internos
 insert into usuarios (id, nombre, email, rol) values
-  ('usr00001-0000-0000-0000-000000000001', 'CEO Shake Aholic', 'ceo@shakeaholic.mx',     'admin'),
-  ('usr00001-0000-0000-0000-000000000002', 'Ana García',       'ana@shakeaholic.mx',     'cajero'),
-  ('usr00001-0000-0000-0000-000000000003', 'Carlos López',     'carlos@shakeaholic.mx',  'cajero'),
-  ('usr00001-0000-0000-0000-000000000004', 'Chef Ramírez',     'cocina@shakeaholic.mx',  'cocina'),
-  ('usr00001-0000-0000-0000-000000000005', 'Barista Jorge',    'jorge@shakeaholic.mx',   'cocina')
+  ('00000000-0000-0000-0006-000000000001', 'CEO Shake Aholic', 'ceo@shakeaholic.mx',    'admin'),
+  ('00000000-0000-0000-0006-000000000002', 'Ana García',       'ana@shakeaholic.mx',    'cajero'),
+  ('00000000-0000-0000-0006-000000000003', 'Carlos López',     'carlos@shakeaholic.mx', 'cajero'),
+  ('00000000-0000-0000-0006-000000000004', 'Chef Ramírez',     'cocina@shakeaholic.mx', 'cocina'),
+  ('00000000-0000-0000-0006-000000000005', 'Barista Jorge',    'jorge@shakeaholic.mx',  'cocina')
 on conflict (id) do nothing;
 
 -- Empleados
 insert into empleados (id, usuario_id, nombre, sucursal_id, rol, pin, activo) values
-  ('emp00001-0000-0000-0000-000000000001', 'usr00001-0000-0000-0000-000000000001',
+  ('00000000-0000-0000-0007-000000000001', '00000000-0000-0000-0006-000000000001',
    'CEO Shake Aholic', '00000000-0000-0000-0000-000000000001', 'administrador', '9999', true),
-  ('emp00001-0000-0000-0000-000000000002', 'usr00001-0000-0000-0000-000000000002',
+  ('00000000-0000-0000-0007-000000000002', '00000000-0000-0000-0006-000000000002',
    'Ana García',       '00000000-0000-0000-0000-000000000001', 'cajero',        '1234', true),
-  ('emp00001-0000-0000-0000-000000000003', 'usr00001-0000-0000-0000-000000000003',
+  ('00000000-0000-0000-0007-000000000003', '00000000-0000-0000-0006-000000000003',
    'Carlos López',     '00000000-0000-0000-0000-000000000001', 'cajero',        '2222', true),
-  ('emp00001-0000-0000-0000-000000000004', 'usr00001-0000-0000-0000-000000000004',
+  ('00000000-0000-0000-0007-000000000004', '00000000-0000-0000-0006-000000000004',
    'Chef Ramírez',     '00000000-0000-0000-0000-000000000001', 'cocina',        '3333', true),
-  ('emp00001-0000-0000-0000-000000000005', 'usr00001-0000-0000-0000-000000000005',
+  ('00000000-0000-0000-0007-000000000005', '00000000-0000-0000-0006-000000000005',
    'Barista Jorge',    '00000000-0000-0000-0000-000000000001', 'bebidas',       '4444', true)
 on conflict (id) do nothing;
 
 -- Clientes de lealtad
 insert into clientes (id, nombre, email, telefono, nivel, puntos, wallet_saldo) values
-  ('cli00001-0000-0000-0000-000000000001', 'María González',   'maria@email.com',   '55-100-0001', 'plata',   450,  120.50),
-  ('cli00001-0000-0000-0000-000000000002', 'Roberto Sánchez',  null,                '55-100-0002', 'oro',    1850,    0.00),
-  ('cli00001-0000-0000-0000-000000000003', 'Laura Torres',     null,                '55-100-0003', 'bronce',   80,   50.00),
-  ('cli00001-0000-0000-0000-000000000004', 'Diego Hernández',  'diego@email.com',   '55-100-0004', 'platino', 5200, 350.00),
-  ('cli00001-0000-0000-0000-000000000005', 'Carmen Ruiz',      'carmen@email.com',  '55-100-0005', 'bronce',  120,    0.00),
-  ('cli00001-0000-0000-0000-000000000006', 'Fernanda Castro',  null,                '55-100-0006', 'plata',   780,   75.00)
+  ('00000000-0000-0000-0008-000000000001', 'María González',  'maria@email.com',  '55-100-0001', 'plata',    450, 120.50),
+  ('00000000-0000-0000-0008-000000000002', 'Roberto Sánchez', null,               '55-100-0002', 'oro',     1850,   0.00),
+  ('00000000-0000-0000-0008-000000000003', 'Laura Torres',    null,               '55-100-0003', 'bronce',    80,  50.00),
+  ('00000000-0000-0000-0008-000000000004', 'Diego Hernández', 'diego@email.com',  '55-100-0004', 'platino', 5200, 350.00),
+  ('00000000-0000-0000-0008-000000000005', 'Carmen Ruiz',     'carmen@email.com', '55-100-0005', 'bronce',   120,   0.00),
+  ('00000000-0000-0000-0008-000000000006', 'Fernanda Castro', null,               '55-100-0006', 'plata',    780,  75.00)
 on conflict (id) do nothing;
 
 -- Gift cards demo
@@ -886,41 +891,41 @@ declare
 
   -- Arrays de IDs de producto y su precio
   prods uuid[] := array[
-    'prod0001-0000-0000-0000-000000000001'::uuid,
-    'prod0001-0000-0000-0000-000000000002'::uuid,
-    'prod0001-0000-0000-0000-000000000003'::uuid,
-    'prod0001-0000-0000-0000-000000000004'::uuid,
-    'prod0001-0000-0000-0000-000000000005'::uuid,
-    'prod0001-0000-0000-0000-000000000006'::uuid,
-    'prod0001-0000-0000-0000-000000000007'::uuid,
-    'prod0001-0000-0000-0000-000000000008'::uuid,
-    'prod0001-0000-0000-0000-000000000009'::uuid,
-    'prod0001-0000-0000-0000-00000000000a'::uuid,
-    'prod0001-0000-0000-0000-00000000000b'::uuid,
-    'prod0001-0000-0000-0000-00000000000c'::uuid,
-    'prod0001-0000-0000-0000-00000000000d'::uuid,
-    'prod0001-0000-0000-0000-00000000000e'::uuid,
-    'prod0001-0000-0000-0000-00000000000f'::uuid,
-    'prod0001-0000-0000-0000-000000000010'::uuid
+    '00000000-0000-0000-0004-000000000001'::uuid,
+    '00000000-0000-0000-0004-000000000002'::uuid,
+    '00000000-0000-0000-0004-000000000003'::uuid,
+    '00000000-0000-0000-0004-000000000004'::uuid,
+    '00000000-0000-0000-0004-000000000005'::uuid,
+    '00000000-0000-0000-0004-000000000006'::uuid,
+    '00000000-0000-0000-0004-000000000007'::uuid,
+    '00000000-0000-0000-0004-000000000008'::uuid,
+    '00000000-0000-0000-0004-000000000009'::uuid,
+    '00000000-0000-0000-0004-000000000010'::uuid,
+    '00000000-0000-0000-0004-000000000011'::uuid,
+    '00000000-0000-0000-0004-000000000012'::uuid,
+    '00000000-0000-0000-0004-000000000013'::uuid,
+    '00000000-0000-0000-0004-000000000014'::uuid,
+    '00000000-0000-0000-0004-000000000015'::uuid,
+    '00000000-0000-0000-0004-000000000016'::uuid
   ];
   precios numeric[] := array[85,85,80,90,90,65,45,70,20,25,110,125,115,35,40,30];
   cocinas uuid[] := array[
-    'c0c1na01-0000-0000-0000-000000000002'::uuid, -- shake bebidas
-    'c0c1na01-0000-0000-0000-000000000002'::uuid,
-    'c0c1na01-0000-0000-0000-000000000002'::uuid,
-    'c0c1na01-0000-0000-0000-000000000002'::uuid,
-    'c0c1na01-0000-0000-0000-000000000002'::uuid,
-    'c0c1na01-0000-0000-0000-000000000002'::uuid, -- café bebidas
-    'c0c1na01-0000-0000-0000-000000000002'::uuid,
-    'c0c1na01-0000-0000-0000-000000000002'::uuid,
-    'c0c1na01-0000-0000-0000-000000000002'::uuid, -- agua bebidas
-    'c0c1na01-0000-0000-0000-000000000002'::uuid,
-    'c0c1na01-0000-0000-0000-000000000001'::uuid, -- bowl alimentos
-    'c0c1na01-0000-0000-0000-000000000001'::uuid,
-    'c0c1na01-0000-0000-0000-000000000001'::uuid,
-    'c0c1na01-0000-0000-0000-000000000001'::uuid, -- snack alimentos
-    'c0c1na01-0000-0000-0000-000000000001'::uuid,
-    'c0c1na01-0000-0000-0000-000000000001'::uuid
+    '00000000-0000-0000-0001-000000000002'::uuid, -- shake bebidas
+    '00000000-0000-0000-0001-000000000002'::uuid,
+    '00000000-0000-0000-0001-000000000002'::uuid,
+    '00000000-0000-0000-0001-000000000002'::uuid,
+    '00000000-0000-0000-0001-000000000002'::uuid,
+    '00000000-0000-0000-0001-000000000002'::uuid, -- café bebidas
+    '00000000-0000-0000-0001-000000000002'::uuid,
+    '00000000-0000-0000-0001-000000000002'::uuid,
+    '00000000-0000-0000-0001-000000000002'::uuid, -- agua bebidas
+    '00000000-0000-0000-0001-000000000002'::uuid,
+    '00000000-0000-0000-0001-000000000001'::uuid, -- bowl alimentos
+    '00000000-0000-0000-0001-000000000001'::uuid,
+    '00000000-0000-0000-0001-000000000001'::uuid,
+    '00000000-0000-0000-0001-000000000001'::uuid, -- snack alimentos
+    '00000000-0000-0000-0001-000000000001'::uuid,
+    '00000000-0000-0000-0001-000000000001'::uuid
   ];
   metodos metodo_pago[] := array[
     'efectivo'::metodo_pago,'efectivo'::metodo_pago,'efectivo'::metodo_pago,
@@ -934,9 +939,9 @@ declare
   ];
   clientes_ids uuid[] := array[
     null::uuid, null::uuid, null::uuid,
-    'cli00001-0000-0000-0000-000000000001'::uuid,
-    'cli00001-0000-0000-0000-000000000002'::uuid,
-    'cli00001-0000-0000-0000-000000000004'::uuid,
+    '00000000-0000-0000-0008-000000000001'::uuid,
+    '00000000-0000-0000-0008-000000000002'::uuid,
+    '00000000-0000-0000-0008-000000000004'::uuid,
     null::uuid, null::uuid
   ];
 

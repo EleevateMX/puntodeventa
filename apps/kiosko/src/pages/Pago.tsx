@@ -20,56 +20,82 @@ export function Pago() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
-      <header className="flex items-center gap-4 px-6 py-4 bg-white shadow-sm">
-        <button onClick={() => navigate('/carrito')} className="text-gray-500 text-2xl">←</button>
-        <h1 className="text-2xl font-bold">Elige cómo pagar</h1>
+    <div className="flex flex-col h-screen bg-sa-cream-paper">
+      <header className="flex items-center gap-4 px-8 py-6 bg-sa-green-deep text-sa-cream">
+        <button
+          onClick={() => navigate('/carrito')}
+          className="w-12 h-12 rounded-full bg-sa-green-ink hover:bg-sa-green flex items-center justify-center text-2xl"
+          aria-label="Volver"
+        >
+          ←
+        </button>
+        <div>
+          <p className="font-mono text-xs uppercase tracking-[0.25em] text-sa-banana">
+            #PAGO
+          </p>
+          <h1 className="font-display text-3xl mt-1">¿Cómo lo pagas?</h1>
+        </div>
       </header>
 
-      <main className="flex-1 flex flex-col items-center justify-center gap-6 p-8">
-        <p className="text-5xl font-extrabold text-gray-900">${total().toFixed(2)}</p>
-        <p className="text-gray-500 text-lg">MXN</p>
+      <main className="flex-1 flex flex-col items-center justify-center gap-8 px-8 py-10">
+        <div className="text-center">
+          <p className="font-mono text-xs uppercase tracking-[0.25em] text-sa-green/70">
+            Total a soltar
+          </p>
+          <p className="font-display text-7xl text-sa-green-ink leading-none mt-2">
+            ${total().toFixed(2)}
+          </p>
+          <p className="font-mono text-sm text-sa-green-ink/60 mt-2">MXN · sin pelos en la lengua</p>
+        </div>
 
-        <div className="flex flex-col gap-4 w-full max-w-md mt-4">
+        <div className="flex flex-col gap-4 w-full max-w-md">
           <button
             onClick={() => setMetodo('terminal')}
-            className={`flex items-center gap-5 p-6 rounded-2xl border-2 transition-all ${
+            className={`flex items-center gap-5 p-6 rounded-sa-lg transition-all text-left ${
               metodo === 'terminal'
-                ? 'border-orange-500 bg-orange-50'
-                : 'border-gray-200 bg-white'
+                ? 'bg-sa-cream-soft ring-4 ring-sa-green shadow-sa'
+                : 'bg-sa-cream-soft hover:bg-sa-cream shadow-sa-sm'
             }`}
           >
-            <span className="text-4xl">💳</span>
-            <div className="text-left">
-              <p className="font-bold text-lg">Terminal bancaria</p>
-              <p className="text-gray-500 text-sm">Mercado Pago</p>
+            <span className="text-5xl">💳</span>
+            <div>
+              <p className="font-display text-2xl text-sa-green-ink leading-tight">
+                Terminal
+              </p>
+              <p className="font-mono text-xs uppercase tracking-wider text-sa-green-ink/60 mt-1">
+                Mercado Pago · tarjeta
+              </p>
             </div>
           </button>
 
           <button
             onClick={() => setMetodo('efectivo')}
-            className={`flex items-center gap-5 p-6 rounded-2xl border-2 transition-all ${
+            className={`flex items-center gap-5 p-6 rounded-sa-lg transition-all text-left ${
               metodo === 'efectivo'
-                ? 'border-orange-500 bg-orange-50'
-                : 'border-gray-200 bg-white'
+                ? 'bg-sa-cream-soft ring-4 ring-sa-green shadow-sa'
+                : 'bg-sa-cream-soft hover:bg-sa-cream shadow-sa-sm'
             }`}
           >
-            <span className="text-4xl">💵</span>
-            <div className="text-left">
-              <p className="font-bold text-lg">Efectivo</p>
-              <p className="text-gray-500 text-sm">Pago en caja</p>
+            <span className="text-5xl">💵</span>
+            <div>
+              <p className="font-display text-2xl text-sa-green-ink leading-tight">
+                Efectivo
+              </p>
+              <p className="font-mono text-xs uppercase tracking-wider text-sa-green-ink/60 mt-1">
+                Paga en caja · billete en mano
+              </p>
             </div>
           </button>
         </div>
       </main>
 
-      <footer className="p-6 bg-white shadow-[0_-4px_16px_rgba(0,0,0,0.08)]">
+      <footer className="px-8 py-6 bg-sa-cream-paper">
         <button
           onClick={confirmarPago}
           disabled={!metodo || procesando}
-          className="w-full bg-orange-500 disabled:opacity-40 text-white py-5 rounded-2xl font-bold text-xl"
+          className="w-full bg-sa-strawberry disabled:bg-sa-cream-warm disabled:text-sa-green-ink/40 text-white py-5 rounded-full font-display text-3xl shadow-sa-sm active:scale-[0.98] transition-transform"
         >
-          {procesando ? 'Procesando...' : 'Confirmar pago'}
+          {procesando ? 'Agitando...' : 'Confirmar pago'}
         </button>
       </footer>
     </div>

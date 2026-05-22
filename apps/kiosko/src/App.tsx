@@ -7,7 +7,7 @@ import { Confirmacion } from './pages/Confirmacion'
 
 export default function App() {
   return (
-    <div className="h-screen w-screen overflow-hidden">
+    <div className="h-screen w-screen overflow-hidden bg-sa-cream-paper font-body text-sa-green-ink">
       <Routes>
         <Route path="/" element={<Navigate to="/catalogo" replace />} />
         <Route path="/catalogo" element={<Catalogo />} />

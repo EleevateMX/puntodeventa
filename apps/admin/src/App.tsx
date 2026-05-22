@@ -92,7 +92,8 @@ export default function App() {
     if (!isSupabaseConfigured) return
     const next = !demoMode
     localStorage.setItem(DEMO_KEY, String(next))
-    window.location.reload()
+    // Navigate to the app root so GitHub Pages serves index.html correctly
+    window.location.href = import.meta.env.BASE_URL
   }
 
   return (

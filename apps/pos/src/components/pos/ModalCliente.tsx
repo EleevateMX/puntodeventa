@@ -1,13 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { usePosStore } from '@/store/posStore'
 import type { ClientePOS } from '../../types'
-
-// Demo clients
-const DEMO_CLIENTES: ClientePOS[] = [
-  { id: 'cl-1', nombre: 'María González', telefono: '555-0001', email: 'maria@email.com', puntos: 450, wallet_saldo: 120.50, nivel: 'plata' },
-  { id: 'cl-2', nombre: 'Roberto Sánchez', telefono: '555-0002', email: null, puntos: 1200, wallet_saldo: 0, nivel: 'oro' },
-  { id: 'cl-3', nombre: 'Laura Torres', telefono: '555-0003', email: null, puntos: 80, wallet_saldo: 50, nivel: 'bronce' },
-]
+import { buscarClientes, isSupabaseConfigured } from '@pos/supabase'
 
 const NIVEL_COLOR: Record<string, string> = {
   bronce: 'bg-sa-mango/30 text-sa-green-ink border-sa-mango',
@@ -24,14 +18,32 @@ interface Props {
 export function ModalCliente({ open, onClose }: Props) {
   const { clienteActivo, setCliente } = usePosStore()
   const [busqueda, setBusqueda] = useState('')
+  const [clientes, setClientes] = useState<ClientePOS[]>([])
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    if (!isSupabaseConfigured) return
+    if (timerRef.current) clearTimeout(timerRef.current)
+    timerRef.current = setTimeout(async () => {
+      try {
+        const rows = await buscarClientes(busqueda)
+        setClientes(rows.map(r => ({
+          id: r.id,
+          nombre: r.nombre,
+          telefono: r.telefono,
+          email: r.email,
+          puntos: r.puntos,
+          wallet_saldo: Number(r.wallet_saldo),
+          nivel: r.nivel,
+        })))
+      } catch { /* silent */ }
+    }, 300)
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current)
+    }
+  }, [busqueda])
 
   if (!open) return null
-
-  const clientesFiltrados = DEMO_CLIENTES.filter(
-    (c) =>
-      c.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-      (c.telefono?.includes(busqueda) ?? false),
-  )
 
   function seleccionarCliente(c: ClientePOS) {
     setCliente(c)
@@ -71,12 +83,12 @@ export function ModalCliente({ open, onClose }: Props) {
         </div>
 
         <div className="max-h-60 overflow-y-auto px-3 pb-4 space-y-2">
-          {clientesFiltrados.length === 0 ? (
+          {clientes.length === 0 ? (
             <p className="text-center font-mono text-sm uppercase tracking-wide text-sa-green-ink/40 py-6">
               Sin resultados
             </p>
           ) : (
-            clientesFiltrados.map((c) => (
+            clientes.map((c) => (
               <button
                 key={c.id}
                 onClick={() => seleccionarCliente(c)}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { usePosStore } from '@/store/posStore'
-import { crearOrden, isSupabaseConfigured } from '@pos/supabase'
+import { crearOrden, isSupabaseConfigured, descontarWalletCliente, descontarGiftCard, buscarGiftCard, agregarPuntosCliente } from '@pos/supabase'
 import type { MetodoPago, PagoItem } from '../types'
 
 const METODOS: { key: MetodoPago; label: string; icon: string }[] = [
@@ -113,6 +113,37 @@ export function Cobro() {
           })),
         )
         folio = `A-${orden.folio}`
+
+        // Run loyalty transactions (wallet, gift card, points) — non-blocking
+        const transactions: Promise<void>[] = []
+
+        // 1. Deduct wallet if used
+        if (walletUsado > 0 && clienteActivo?.id) {
+          transactions.push(
+            descontarWalletCliente(clienteActivo.id, walletUsado, orden.id)
+          )
+        }
+
+        // 2. Deduct gift card if applied
+        if (gcAplicada && gcDescuento > 0) {
+          transactions.push(
+            buscarGiftCard(gcAplicada.codigo).then(gc => {
+              if (gc) return descontarGiftCard(gc.id, gcDescuento)
+            })
+          )
+        }
+
+        // 3. Add points: 1 punto per $10 spent (floor)
+        if (clienteActivo?.id) {
+          const puntosGanados = Math.floor(totalOrden / 10)
+          if (puntosGanados > 0) {
+            transactions.push(
+              agregarPuntosCliente(clienteActivo.id, puntosGanados, orden.id)
+            )
+          }
+        }
+
+        await Promise.allSettled(transactions)
       } catch (err) {
         console.error('Error al guardar orden en Supabase:', err)
         // fall through — folio already set from timestamp above

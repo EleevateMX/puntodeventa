@@ -21,6 +21,27 @@ interface Producto {
 }
 
 
+const DEMO_CATEGORIAS: Categoria[] = [
+  { id: 'cat-1', nombre: 'Shakes', cocinas: { id: 'coc-1', nombre: 'Bebidas', slug: 'bebidas' } },
+  { id: 'cat-2', nombre: 'Bowls', cocinas: { id: 'coc-2', nombre: 'Alimentos', slug: 'alimentos' } },
+  { id: 'cat-3', nombre: 'Snacks', cocinas: { id: 'coc-2', nombre: 'Alimentos', slug: 'alimentos' } },
+  { id: 'cat-4', nombre: 'Cafés', cocinas: { id: 'coc-1', nombre: 'Bebidas', slug: 'bebidas' } },
+]
+
+const DEMO_PRODUCTOS: Producto[] = [
+  { id: 'p1', nombre: 'Shake de Fresa', descripcion: 'Fresas frescas, leche de almendra y proteína', precio: 89, imagen_url: null, categoria_id: 'cat-1', categorias: DEMO_CATEGORIAS[0] ?? null },
+  { id: 'p2', nombre: 'Shake de Mango', descripcion: 'Mango mexicano, coco y leche', precio: 89, imagen_url: null, categoria_id: 'cat-1', categorias: DEMO_CATEGORIAS[0] ?? null },
+  { id: 'p3', nombre: 'Shake Verde', descripcion: 'Espinaca, pepino, piña y jengibre', precio: 95, imagen_url: null, categoria_id: 'cat-1', categorias: DEMO_CATEGORIAS[0] ?? null },
+  { id: 'p4', nombre: 'Shake Choco-Proteína', descripcion: 'Cacao, plátano y proteína de suero', precio: 99, imagen_url: null, categoria_id: 'cat-1', categorias: DEMO_CATEGORIAS[0] ?? null },
+  { id: 'p5', nombre: 'Power Bowl', descripcion: 'Pollo a la plancha, arroz integral, aguacate y verduras', precio: 149, imagen_url: null, categoria_id: 'cat-2', categorias: DEMO_CATEGORIAS[1] ?? null },
+  { id: 'p6', nombre: 'Açaí Bowl', descripcion: 'Base de açaí, granola, frutos rojos y miel', precio: 139, imagen_url: null, categoria_id: 'cat-2', categorias: DEMO_CATEGORIAS[1] ?? null },
+  { id: 'p7', nombre: 'Veggie Bowl', descripcion: 'Garbanzos, espinaca, betabel asado y tahini', precio: 135, imagen_url: null, categoria_id: 'cat-2', categorias: DEMO_CATEGORIAS[1] ?? null },
+  { id: 'p8', nombre: 'Energy Bites', descripcion: 'Bolas de avena, mantequilla de maní y dátil · 6 pzas', precio: 75, imagen_url: null, categoria_id: 'cat-3', categorias: DEMO_CATEGORIAS[2] ?? null },
+  { id: 'p9', nombre: 'Mix de Nueces', descripcion: 'Almendras, nuez de la India y arándanos', precio: 65, imagen_url: null, categoria_id: 'cat-3', categorias: DEMO_CATEGORIAS[2] ?? null },
+  { id: 'p10', nombre: 'Café Americano', descripcion: 'Espresso doble con agua caliente', precio: 55, imagen_url: null, categoria_id: 'cat-4', categorias: DEMO_CATEGORIAS[3] ?? null },
+  { id: 'p11', nombre: 'Cold Brew', descripcion: 'Café en frío 12h, suave y sin acidez', precio: 69, imagen_url: null, categoria_id: 'cat-4', categorias: DEMO_CATEGORIAS[3] ?? null },
+]
+
 export function Catalogo() {
   const navigate = useNavigate()
   const { agregar, totalItems } = useCarrito()
@@ -31,12 +52,13 @@ export function Catalogo() {
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
+      setProductos(DEMO_PRODUCTOS)
+      setCategorias(DEMO_CATEGORIAS)
       setLoading(false)
       return
     }
     Promise.all([getProductosConCategorias(), getCategorias()])
       .then(([prods, cats]) => {
-        // Map to local Producto type — the shapes are compatible
         setProductos(prods as Producto[])
         setCategorias(cats as Categoria[])
       })

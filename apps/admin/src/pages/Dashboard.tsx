@@ -1,4 +1,26 @@
 import React, { useEffect, useMemo, useState } from 'react'
+
+// ── KPI SVG icons ──────────────────────────────────────────────────────────────
+const KpiVentas = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="text-sa-banana">
+    <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+  </svg>
+)
+const KpiOrdenes = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="text-sa-blueberry">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/>
+  </svg>
+)
+const KpiCocina = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="text-sa-strawberry">
+    <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5Z"/>
+  </svg>
+)
+const KpiEmpleados = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="text-sa-green">
+    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+  </svg>
+)
 import { Link } from 'react-router-dom'
 import { useReportes } from '../hooks/useReportes'
 import { useInventario } from '../hooks/useInventario'
@@ -222,7 +244,7 @@ export function Dashboard() {
         <div className="bg-white rounded-sa p-5 shadow-sa-sm border border-sa-green-ink/5 transition-all hover:shadow-sa hover:-translate-y-0.5">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs text-sa-green-ink/60 font-mono uppercase tracking-wide">Ventas de hoy</span>
-            <span className="text-2xl">💰</span>
+            <KpiVentas />
           </div>
           <p className="text-4xl font-display text-sa-green-ink leading-none">{formatCurrency(totalHoy)}</p>
           <p
@@ -238,7 +260,7 @@ export function Dashboard() {
         <div className="bg-white rounded-sa p-5 shadow-sa-sm border border-sa-green-ink/5 transition-all hover:shadow-sa hover:-translate-y-0.5">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs text-sa-green-ink/60 font-mono uppercase tracking-wide">Órdenes hoy</span>
-            <span className="text-2xl">🧾</span>
+            <KpiOrdenes />
           </div>
           <p className="text-4xl font-display text-sa-green-ink leading-none">{ordenesHoy}</p>
           <p className="text-xs mt-3 text-sa-green-ink/60">
@@ -255,7 +277,7 @@ export function Dashboard() {
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-sa-strawberry animate-pulse"></span>
               </span>
             </div>
-            <span className="text-2xl">🍳</span>
+            <KpiCocina />
           </div>
           <p className="text-4xl font-display text-sa-green-ink leading-none">{enCocinaCount}</p>
           <p className="text-xs mt-3 text-sa-green-ink/60">{nuevasCount} nuevas · {preparandoCount} preparando</p>
@@ -264,7 +286,7 @@ export function Dashboard() {
         <div className="bg-white rounded-sa p-5 shadow-sa-sm border border-sa-green-ink/5 transition-all hover:shadow-sa hover:-translate-y-0.5">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs text-sa-green-ink/60 font-mono uppercase tracking-wide">Empleados activos</span>
-            <span className="text-2xl">👥</span>
+            <KpiEmpleados />
           </div>
           <p className="text-4xl font-display text-sa-green-ink leading-none">{empleadosActivos}</p>
           <p className="text-xs mt-3 text-sa-green-ink/60">de {empleadosTotales} totales</p>

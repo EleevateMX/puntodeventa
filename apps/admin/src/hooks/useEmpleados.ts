@@ -1,4 +1,3 @@
-/// <reference types="vite/client" />
 import { useState, useCallback, useEffect } from 'react'
 import {
   isSupabaseConfigured,
@@ -36,13 +35,15 @@ const DEMO_EMPLEADOS: Empleado[] = [
   { id: '5', nombre: 'Roberto Sánchez',  pin: '9012', rol: 'supervisor', activo: false, sucursal_id: null },
 ]
 
+const usarDemo = () => !isSupabaseConfigured || localStorage.getItem('shake-demo-mode') === 'true'
+
 export function useEmpleados() {
   const [empleados, setEmpleados] = useState<Empleado[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const cargar = useCallback(async () => {
-    if (!isSupabaseConfigured) {
+    if (usarDemo()) {
       setEmpleados(DEMO_EMPLEADOS)
       return
     }
@@ -68,7 +69,7 @@ export function useEmpleados() {
   useEffect(() => { void cargar() }, [cargar])
 
   async function agregarEmpleado(input: EmpleadoInput): Promise<void> {
-    if (!isSupabaseConfigured) {
+    if (usarDemo()) {
       const nuevo: Empleado = { ...input, id: Math.random().toString(36).slice(2, 10) }
       setEmpleados((prev) => [...prev, nuevo])
       return
@@ -84,7 +85,7 @@ export function useEmpleados() {
   }
 
   async function editarEmpleado(id: string, input: EmpleadoInput): Promise<void> {
-    if (!isSupabaseConfigured) {
+    if (usarDemo()) {
       setEmpleados((prev) =>
         prev.map((e) => (e.id === id ? { ...e, ...input } : e)),
       )
@@ -101,7 +102,7 @@ export function useEmpleados() {
   }
 
   async function borrarEmpleado(id: string): Promise<void> {
-    if (!isSupabaseConfigured) {
+    if (usarDemo()) {
       setEmpleados((prev) => prev.filter((e) => e.id !== id))
       return
     }
@@ -110,7 +111,7 @@ export function useEmpleados() {
   }
 
   async function toggleActivoEmpleado(id: string): Promise<void> {
-    if (!isSupabaseConfigured) {
+    if (usarDemo()) {
       setEmpleados((prev) =>
         prev.map((e) => (e.id === id ? { ...e, activo: !e.activo } : e)),
       )

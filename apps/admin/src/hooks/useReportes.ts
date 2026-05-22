@@ -132,6 +132,8 @@ function mapProductoVendidoRow(row: ProductoVendidoRow): VentaProducto {
   }
 }
 
+const usarDemo = () => !isSupabaseConfigured || localStorage.getItem('shake-demo-mode') === 'true'
+
 export function useReportes() {
   const [periodo, setPeriodo] = useState<Periodo>('30d')
   const [loading, setLoading] = useState(false)
@@ -140,7 +142,7 @@ export function useReportes() {
   const [realProductos, setRealProductos] = useState<VentaProducto[] | null>(null)
 
   useEffect(() => {
-    if (!isSupabaseConfigured) return
+    if (usarDemo()) return
 
     setLoading(true)
     setError(null)

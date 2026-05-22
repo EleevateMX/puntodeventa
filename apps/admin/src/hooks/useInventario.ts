@@ -1,4 +1,17 @@
-import { useState, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import {
+  isSupabaseConfigured,
+  getAlmacenes, getInsumos, getStock, getLotes, getMermas, getTransferencias,
+  crearInsumo as crearInsumoDB,
+  actualizarInsumo as actualizarInsumoDB,
+  eliminarInsumo as eliminarInsumoDB,
+  upsertStock,
+  crearLote as crearLoteDB,
+  eliminarLote as eliminarLoteDB,
+  registrarMermaDB,
+  crearTransferenciaDB,
+  cambiarEstadoTransferenciaDB,
+} from '@pos/supabase'
 
 export interface Almacen {
   id: string
@@ -59,7 +72,7 @@ export interface Transferencia {
   items: TransferenciaItem[]
 }
 
-// ─── Demo data ────────────────────────────────────────────────────────────────
+// ─── Demo data ─────────────────────────────────────────────────────────────────
 
 const ALMACENES_DEMO: Almacen[] = [
   { id: 'alm-1', nombre: 'Almacén Central', tipo: 'central', sucursal_id: null },
@@ -78,22 +91,22 @@ const INSUMOS_DEMO: Insumo[] = [
 ]
 
 const STOCK_DEMO: StockItem[] = [
-  { id: 's1', insumo_id: 'ins-1', almacen_id: 'alm-1', stock_actual: 25.0, stock_minimo: 5.0 },
-  { id: 's2', insumo_id: 'ins-1', almacen_id: 'alm-2', stock_actual: 8.0, stock_minimo: 2.0 },
-  { id: 's3', insumo_id: 'ins-2', almacen_id: 'alm-1', stock_actual: 40.0, stock_minimo: 10.0 },
-  { id: 's4', insumo_id: 'ins-2', almacen_id: 'alm-2', stock_actual: 3.0, stock_minimo: 4.0 },
-  { id: 's5', insumo_id: 'ins-3', almacen_id: 'alm-1', stock_actual: 12.0, stock_minimo: 3.0 },
-  { id: 's6', insumo_id: 'ins-3', almacen_id: 'alm-2', stock_actual: 0.5, stock_minimo: 2.0 },
-  { id: 's7', insumo_id: 'ins-4', almacen_id: 'alm-1', stock_actual: 8.0, stock_minimo: 2.0 },
+  { id: 's1', insumo_id: 'ins-1', almacen_id: 'alm-1', stock_actual: 25, stock_minimo: 5 },
+  { id: 's2', insumo_id: 'ins-1', almacen_id: 'alm-2', stock_actual: 8, stock_minimo: 2 },
+  { id: 's3', insumo_id: 'ins-2', almacen_id: 'alm-1', stock_actual: 40, stock_minimo: 10 },
+  { id: 's4', insumo_id: 'ins-2', almacen_id: 'alm-2', stock_actual: 3, stock_minimo: 4 },
+  { id: 's5', insumo_id: 'ins-3', almacen_id: 'alm-1', stock_actual: 12, stock_minimo: 3 },
+  { id: 's6', insumo_id: 'ins-3', almacen_id: 'alm-2', stock_actual: 0.5, stock_minimo: 2 },
+  { id: 's7', insumo_id: 'ins-4', almacen_id: 'alm-1', stock_actual: 8, stock_minimo: 2 },
   { id: 's8', insumo_id: 'ins-4', almacen_id: 'alm-2', stock_actual: 1.8, stock_minimo: 0.5 },
   { id: 's9', insumo_id: 'ins-5', almacen_id: 'alm-1', stock_actual: 30, stock_minimo: 10 },
   { id: 's10', insumo_id: 'ins-5', almacen_id: 'alm-2', stock_actual: 4, stock_minimo: 5 },
-  { id: 's11', insumo_id: 'ins-6', almacen_id: 'alm-1', stock_actual: 15.0, stock_minimo: 3.0 },
-  { id: 's12', insumo_id: 'ins-6', almacen_id: 'alm-2', stock_actual: 3.5, stock_minimo: 2.0 },
-  { id: 's13', insumo_id: 'ins-7', almacen_id: 'alm-1', stock_actual: 20.0, stock_minimo: 5.0 },
-  { id: 's14', insumo_id: 'ins-7', almacen_id: 'alm-2', stock_actual: 5.0, stock_minimo: 2.0 },
-  { id: 's15', insumo_id: 'ins-8', almacen_id: 'alm-1', stock_actual: 60.0, stock_minimo: 20.0 },
-  { id: 's16', insumo_id: 'ins-8', almacen_id: 'alm-2', stock_actual: 18.0, stock_minimo: 10.0 },
+  { id: 's11', insumo_id: 'ins-6', almacen_id: 'alm-1', stock_actual: 15, stock_minimo: 3 },
+  { id: 's12', insumo_id: 'ins-6', almacen_id: 'alm-2', stock_actual: 3.5, stock_minimo: 2 },
+  { id: 's13', insumo_id: 'ins-7', almacen_id: 'alm-1', stock_actual: 20, stock_minimo: 5 },
+  { id: 's14', insumo_id: 'ins-7', almacen_id: 'alm-2', stock_actual: 5, stock_minimo: 2 },
+  { id: 's15', insumo_id: 'ins-8', almacen_id: 'alm-1', stock_actual: 60, stock_minimo: 20 },
+  { id: 's16', insumo_id: 'ins-8', almacen_id: 'alm-2', stock_actual: 18, stock_minimo: 10 },
 ]
 
 const LOTES_DEMO: Lote[] = [
@@ -116,70 +129,124 @@ const TRANSFERENCIAS_DEMO: Transferencia[] = [
   { id: 'tr-3', origen_id: 'alm-1', destino_id: 'alm-2', estado: 'pendiente', notas: null, created_at: '2026-05-22T11:00:00Z', items: [{ insumo_id: 'ins-2', cantidad: 6 }] },
 ]
 
-// ─── Hook ─────────────────────────────────────────────────────────────────────
+// ─── Hook ──────────────────────────────────────────────────────────────────────
+
+const usarDemo = () => !isSupabaseConfigured || localStorage.getItem('shake-demo-mode') === 'true'
 
 export function useInventario() {
-  const [almacenes] = useState<Almacen[]>(ALMACENES_DEMO)
-  const [insumos, setInsumos] = useState<Insumo[]>(INSUMOS_DEMO)
-  const [stock, setStock] = useState<StockItem[]>(STOCK_DEMO)
-  const [lotes, setLotes] = useState<Lote[]>(LOTES_DEMO)
-  const [mermas, setMermas] = useState<Merma[]>(MERMAS_DEMO)
-  const [transferencias, setTransferencias] = useState<Transferencia[]>(TRANSFERENCIAS_DEMO)
+  const demo = usarDemo()
+
+  const [loading, setLoading] = useState(!demo)
+  const [almacenes, setAlmacenes] = useState<Almacen[]>(demo ? ALMACENES_DEMO : [])
+  const [insumos, setInsumos] = useState<Insumo[]>(demo ? INSUMOS_DEMO : [])
+  const [stock, setStock] = useState<StockItem[]>(demo ? STOCK_DEMO : [])
+  const [lotes, setLotes] = useState<Lote[]>(demo ? LOTES_DEMO : [])
+  const [mermas, setMermas] = useState<Merma[]>(demo ? MERMAS_DEMO : [])
+  const [transferencias, setTransferencias] = useState<Transferencia[]>(demo ? TRANSFERENCIAS_DEMO : [])
+
+  const cargar = useCallback(async () => {
+    if (demo) return
+    try {
+      const [alms, ins, stk, lts, mrm, trn] = await Promise.all([
+        getAlmacenes(), getInsumos(), getStock(), getLotes(), getMermas(), getTransferencias(),
+      ])
+      setAlmacenes(alms.map((a) => ({ id: a.id, nombre: a.nombre, tipo: a.tipo as Almacen['tipo'], sucursal_id: a.sucursal_id })))
+      setInsumos(ins.map((i) => ({ id: i.id, nombre: i.nombre, unidad: i.unidad, costo_unitario: Number(i.costo_unitario) })))
+      setStock(stk.map((s) => ({ id: s.id, almacen_id: s.almacen_id, insumo_id: s.insumo_id, stock_actual: Number(s.stock_actual), stock_minimo: Number(s.stock_minimo) })))
+      setLotes(lts.map((l) => ({ id: l.id, insumo_id: l.insumo_id, almacen_id: l.almacen_id, numero_lote: l.numero_lote, cantidad_inicial: Number(l.cantidad_inicial), cantidad_actual: Number(l.cantidad_actual), costo_unitario: l.costo_unitario !== null ? Number(l.costo_unitario) : null, fecha_vencimiento: l.fecha_vencimiento })))
+      setMermas(mrm.map((m) => ({ id: m.id, insumo_id: m.insumo_id, almacen_id: m.almacen_id, lote_id: m.lote_id, cantidad: Number(m.cantidad), tipo: m.tipo as Merma['tipo'], notas: m.notas, created_at: m.created_at })))
+      setTransferencias(trn.map((t) => ({ id: t.id, origen_id: t.origen_id, destino_id: t.destino_id, estado: t.estado as Transferencia['estado'], notas: t.notas, created_at: t.created_at, items: t.items.map((i) => ({ insumo_id: i.insumo_id, cantidad: Number(i.cantidad) })) })))
+    } catch (err) {
+      console.error('Error cargando inventario:', err)
+    } finally {
+      setLoading(false)
+    }
+  }, [demo])
+
+  useEffect(() => { cargar() }, [cargar])
 
   // ── Insumos ──
-  const agregarInsumo = useCallback((data: Omit<Insumo, 'id'>) => {
-    const nuevo: Insumo = { ...data, id: `ins-${Date.now()}` }
+
+  const agregarInsumo = useCallback(async (data: Omit<Insumo, 'id'>) => {
+    if (demo) {
+      const nuevo: Insumo = { ...data, id: `ins-${Date.now()}` }
+      setInsumos((prev) => [...prev, nuevo])
+      setStock((prev) => [
+        ...prev,
+        ...ALMACENES_DEMO.map((a, i) => ({ id: `s-${Date.now()}-${i}`, insumo_id: nuevo.id, almacen_id: a.id, stock_actual: 0, stock_minimo: 0 })),
+      ])
+      return nuevo
+    }
+    const row = await crearInsumoDB(data)
+    const nuevo: Insumo = { id: row.id, nombre: row.nombre, unidad: row.unidad, costo_unitario: Number(row.costo_unitario) }
     setInsumos((prev) => [...prev, nuevo])
-    // Add empty stock entries for each almacen
-    setStock((prev) => [
-      ...prev,
-      ...ALMACENES_DEMO.map((a, i) => ({
-        id: `s-${Date.now()}-${i}`,
-        insumo_id: nuevo.id,
-        almacen_id: a.id,
-        stock_actual: 0,
-        stock_minimo: 0,
-      })),
-    ])
+    // Create empty stock rows for each warehouse
+    await Promise.allSettled(almacenes.map((a) => upsertStock(a.id, nuevo.id, 0, 0)))
+    const nuevosStock = almacenes.map((a, i) => ({ id: `tmp-${i}`, insumo_id: nuevo.id, almacen_id: a.id, stock_actual: 0, stock_minimo: 0 }))
+    setStock((prev) => [...prev, ...nuevosStock])
     return nuevo
-  }, [])
+  }, [demo, almacenes])
 
-  const editarInsumo = useCallback((id: string, data: Omit<Insumo, 'id'>) => {
+  const editarInsumo = useCallback(async (id: string, data: Omit<Insumo, 'id'>) => {
+    if (!demo) await actualizarInsumoDB(id, data)
     setInsumos((prev) => prev.map((i) => (i.id === id ? { ...i, ...data } : i)))
-  }, [])
+  }, [demo])
 
-  const borrarInsumo = useCallback((id: string) => {
+  const borrarInsumo = useCallback(async (id: string) => {
+    if (!demo) await eliminarInsumoDB(id)
     setInsumos((prev) => prev.filter((i) => i.id !== id))
     setStock((prev) => prev.filter((s) => s.insumo_id !== id))
-  }, [])
+  }, [demo])
 
   // ── Stock ──
-  const ajustarStock = useCallback((insumoId: string, almacenId: string, cantidad: number) => {
+
+  const ajustarStock = useCallback(async (insumoId: string, almacenId: string, cantidad: number) => {
+    const valor = Math.max(0, cantidad)
+    if (!demo) await upsertStock(almacenId, insumoId, valor)
     setStock((prev) =>
       prev.map((s) =>
-        s.insumo_id === insumoId && s.almacen_id === almacenId
-          ? { ...s, stock_actual: Math.max(0, cantidad) }
-          : s,
+        s.insumo_id === insumoId && s.almacen_id === almacenId ? { ...s, stock_actual: valor } : s,
       ),
     )
-  }, [])
+  }, [demo])
 
   // ── Lotes ──
-  const agregarLote = useCallback((data: Omit<Lote, 'id'>) => {
-    const nuevo: Lote = { ...data, id: `lot-${Date.now()}` }
+
+  const agregarLote = useCallback(async (data: Omit<Lote, 'id'>) => {
+    if (demo) {
+      const nuevo: Lote = { ...data, id: `lot-${Date.now()}` }
+      setLotes((prev) => [...prev, nuevo])
+      return nuevo
+    }
+    const row = await crearLoteDB(data)
+    const nuevo: Lote = { id: row.id, insumo_id: row.insumo_id, almacen_id: row.almacen_id, numero_lote: row.numero_lote, cantidad_inicial: Number(row.cantidad_inicial), cantidad_actual: Number(row.cantidad_actual), costo_unitario: row.costo_unitario !== null ? Number(row.costo_unitario) : null, fecha_vencimiento: row.fecha_vencimiento }
     setLotes((prev) => [...prev, nuevo])
     return nuevo
-  }, [])
+  }, [demo])
 
-  const borrarLote = useCallback((id: string) => {
+  const borrarLote = useCallback(async (id: string) => {
+    if (!demo) await eliminarLoteDB(id)
     setLotes((prev) => prev.filter((l) => l.id !== id))
-  }, [])
+  }, [demo])
 
   // ── Mermas ──
-  const registrarMerma = useCallback((data: Omit<Merma, 'id' | 'created_at'>) => {
-    const nueva: Merma = { ...data, id: `mer-${Date.now()}`, created_at: new Date().toISOString() }
+
+  const registrarMerma = useCallback(async (data: Omit<Merma, 'id' | 'created_at'>) => {
+    if (demo) {
+      const nueva: Merma = { ...data, id: `mer-${Date.now()}`, created_at: new Date().toISOString() }
+      setMermas((prev) => [nueva, ...prev])
+      setStock((prev) =>
+        prev.map((s) =>
+          s.insumo_id === data.insumo_id && s.almacen_id === data.almacen_id
+            ? { ...s, stock_actual: Math.max(0, s.stock_actual - data.cantidad) }
+            : s,
+        ),
+      )
+      return nueva
+    }
+    const row = await registrarMermaDB(data)
+    const nueva: Merma = { id: row.id, insumo_id: row.insumo_id, almacen_id: row.almacen_id, lote_id: row.lote_id, cantidad: Number(row.cantidad), tipo: row.tipo as Merma['tipo'], notas: row.notas, created_at: row.created_at }
     setMermas((prev) => [nueva, ...prev])
-    // Deduct from stock
     setStock((prev) =>
       prev.map((s) =>
         s.insumo_id === data.insumo_id && s.almacen_id === data.almacen_id
@@ -188,60 +255,66 @@ export function useInventario() {
       ),
     )
     return nueva
-  }, [])
+  }, [demo])
 
   // ── Transferencias ──
-  const crearTransferencia = useCallback(
-    (origenId: string, destinoId: string, items: TransferenciaItem[], notas: string) => {
-      const nueva: Transferencia = {
-        id: `tr-${Date.now()}`,
-        origen_id: origenId,
-        destino_id: destinoId,
-        estado: 'pendiente',
-        notas: notas || null,
-        created_at: new Date().toISOString(),
-        items,
-      }
+
+  const crearTransferencia = useCallback(async (
+    origenId: string,
+    destinoId: string,
+    items: TransferenciaItem[],
+    notas: string,
+  ) => {
+    if (demo) {
+      const nueva: Transferencia = { id: `tr-${Date.now()}`, origen_id: origenId, destino_id: destinoId, estado: 'pendiente', notas: notas || null, created_at: new Date().toISOString(), items }
       setTransferencias((prev) => [nueva, ...prev])
       return nueva
-    },
-    [],
-  )
+    }
+    const result = await crearTransferenciaDB(origenId, destinoId, items, notas)
+    const nueva: Transferencia = { id: result.id, origen_id: result.origen_id, destino_id: result.destino_id, estado: result.estado as Transferencia['estado'], notas: result.notas, created_at: result.created_at, items }
+    setTransferencias((prev) => [nueva, ...prev])
+    return nueva
+  }, [demo])
 
-  const cambiarEstadoTransferencia = useCallback(
-    (id: string, estado: Transferencia['estado']) => {
-      setTransferencias((prev) =>
-        prev.map((t) => {
-          if (t.id !== id) return t
-          // When received, update stock
-          if (estado === 'recibida') {
-            setStock((prevStock) => {
-              let updated = [...prevStock]
-              t.items.forEach((item) => {
-                updated = updated.map((s) => {
-                  if (s.insumo_id === item.insumo_id && s.almacen_id === t.origen_id)
-                    return { ...s, stock_actual: Math.max(0, s.stock_actual - item.cantidad) }
-                  if (s.insumo_id === item.insumo_id && s.almacen_id === t.destino_id)
-                    return { ...s, stock_actual: s.stock_actual + item.cantidad }
-                  return s
-                })
+  const cambiarEstadoTransferencia = useCallback(async (id: string, estado: Transferencia['estado']) => {
+    if (!demo) await cambiarEstadoTransferenciaDB(id, estado)
+    setTransferencias((prev) =>
+      prev.map((t) => {
+        if (t.id !== id) return t
+        if (estado === 'recibida') {
+          setStock((prevStock) => {
+            let updated = [...prevStock]
+            t.items.forEach((item) => {
+              updated = updated.map((s) => {
+                if (s.insumo_id === item.insumo_id && s.almacen_id === t.origen_id)
+                  return { ...s, stock_actual: Math.max(0, s.stock_actual - item.cantidad) }
+                if (s.insumo_id === item.insumo_id && s.almacen_id === t.destino_id)
+                  return { ...s, stock_actual: s.stock_actual + item.cantidad }
+                return s
               })
-              return updated
             })
-          }
-          return { ...t, estado }
-        }),
-      )
-    },
-    [],
-  )
+            // Sync stock changes to DB
+            if (!demo) {
+              t.items.forEach((item) => {
+                const src = updated.find((s) => s.insumo_id === item.insumo_id && s.almacen_id === t.origen_id)
+                const dst = updated.find((s) => s.insumo_id === item.insumo_id && s.almacen_id === t.destino_id)
+                if (src) upsertStock(t.origen_id, item.insumo_id, src.stock_actual).catch(console.error)
+                if (dst) upsertStock(t.destino_id, item.insumo_id, dst.stock_actual).catch(console.error)
+              })
+            }
+            return updated
+          })
+        }
+        return { ...t, estado }
+      }),
+    )
+  }, [demo])
 
   // ── Helpers ──
+
   const getStockInsumo = useCallback(
     (insumoId: string, almacenId?: string): StockItem[] =>
-      stock.filter(
-        (s) => s.insumo_id === insumoId && (!almacenId || s.almacen_id === almacenId),
-      ),
+      stock.filter((s) => s.insumo_id === insumoId && (!almacenId || s.almacen_id === almacenId)),
     [stock],
   )
 
@@ -257,6 +330,8 @@ export function useInventario() {
   })
 
   return {
+    loading,
+    demo,
     almacenes,
     insumos,
     stock,

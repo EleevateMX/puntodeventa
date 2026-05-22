@@ -139,6 +139,8 @@ export interface ClienteInput {
   email: string | null
 }
 
+const usarDemo = () => !isSupabaseConfigured || localStorage.getItem('shake-demo-mode') === 'true'
+
 export function useLealtad() {
   const [clientes, setClientes] = useState<ClienteLealtad[]>([])
   const [giftCards, setGiftCards] = useState<GiftCard[]>([])
@@ -146,7 +148,7 @@ export function useLealtad() {
   const [error, setError] = useState<string | null>(null)
 
   const cargar = useCallback(async () => {
-    if (!isSupabaseConfigured) return
+    if (usarDemo()) return
     setLoading(true)
     setError(null)
     try {
@@ -190,7 +192,7 @@ export function useLealtad() {
   }
 
   async function cargarPuntosWallet(id: string, puntos: number, wallet: number): Promise<void> {
-    if (!isSupabaseConfigured) {
+    if (usarDemo()) {
       // In-memory fallback when Supabase is not configured
       setClientes((prev) =>
         prev.map((c) => {

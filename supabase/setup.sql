@@ -960,9 +960,9 @@ begin
     for ord_i in 1..v_num_ord loop
       v_orden_id   := gen_random_uuid();
       v_hora_base  := (interval '1 second' * floor(random() * 36000 + 28800)::int); -- 8am-6pm
-      v_metodo     := metodos[1 + floor(random() * 8)::int % 8 + 1];
-      v_canal      := canales[1 + floor(random() * 5)::int % 5 + 1];
-      ci           := 1 + floor(random() * 8)::int % 8 + 1;
+      v_metodo     := metodos[(floor(random() * 8)::int % 8) + 1];
+      v_canal      := canales[(floor(random() * 5)::int % 5) + 1];
+      ci           := (floor(random() * 8)::int % 8) + 1;
       v_cliente_id := clientes_ids[ci];
       v_total      := 0;
 
@@ -985,7 +985,7 @@ begin
       -- Ítems: 1-3 productos por orden
       v_num_items := 1 + floor(random() * 3)::int;
       for item_i in 1..v_num_items loop
-        idx        := 1 + floor(random() * 16)::int % 16 + 1;
+        idx        := (floor(random() * 16)::int % 16) + 1;
         v_prod_id  := prods[idx];
         v_precio   := precios[idx];
         v_cocina_id := cocinas[idx];

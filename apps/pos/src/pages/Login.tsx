@@ -28,15 +28,25 @@ export function Login() {
   const [error, setError] = useState('')
   const [validando, setValidando] = useState(false)
 
+  const [usandoDemo, setUsandoDemo] = useState(!isSupabaseConfigured)
+
   useEffect(() => {
     if (!isSupabaseConfigured) {
       setEmpleados(DEMO_EMPLEADOS)
+      setUsandoDemo(true)
       setCargando(false)
       return
     }
     getEmpleados()
-      .then((rows) => setEmpleados(rows.map((r) => ({ id: r.id, nombre: r.nombre, rol: r.rol }))))
-      .catch(() => setEmpleados(DEMO_EMPLEADOS))
+      .then((rows) => {
+        if (rows.length === 0) {
+          setEmpleados(DEMO_EMPLEADOS)
+          setUsandoDemo(true)
+        } else {
+          setEmpleados(rows.map((r) => ({ id: r.id, nombre: r.nombre, rol: r.rol })))
+        }
+      })
+      .catch(() => { setEmpleados(DEMO_EMPLEADOS); setUsandoDemo(true) })
       .finally(() => setCargando(false))
   }, [])
 
@@ -61,26 +71,26 @@ export function Login() {
     if (!empleadoSeleccionado || pin.length < 4 || validando) return
     setValidando(true)
     try {
-      if (isSupabaseConfigured) {
+      if (isSupabaseConfigured && !usandoDemo) {
         const emp = await buscarEmpleadoPorPin(pin, sucursalId)
         if (emp && emp.id === empleadoSeleccionado.id) {
           iniciarSesion({ id: emp.id, nombre: emp.nombre, rol: emp.rol }, `turno-${Date.now()}`)
           navigate('/')
-        } else {
-          setError('Ese PIN no agita, intenta de nuevo')
-          setPin('')
+          return
         }
+        setError('Ese PIN no agita, intenta de nuevo')
+        setPin('')
+        return
+      }
+      if (pin === DEMO_PINS[empleadoSeleccionado.id]) {
+        iniciarSesion(
+          { id: empleadoSeleccionado.id, nombre: empleadoSeleccionado.nombre, rol: empleadoSeleccionado.rol },
+          `turno-${Date.now()}`,
+        )
+        navigate('/')
       } else {
-        if (pin === DEMO_PINS[empleadoSeleccionado.id]) {
-          iniciarSesion(
-            { id: empleadoSeleccionado.id, nombre: empleadoSeleccionado.nombre, rol: empleadoSeleccionado.rol },
-            `turno-${Date.now()}`,
-          )
-          navigate('/')
-        } else {
-          setError('Ese PIN no agita, intenta de nuevo')
-          setPin('')
-        }
+        setError('Ese PIN no agita, intenta de nuevo')
+        setPin('')
       }
     } finally {
       setValidando(false)
@@ -136,6 +146,11 @@ export function Login() {
                   <p className="font-mono text-[10px] uppercase tracking-wide text-sa-green-ink/50 mt-1">
                     {emp.rol}
                   </p>
+                  {usandoDemo && (
+                    <p className="font-mono text-[9px] text-sa-green/60 mt-1 bg-sa-green/10 rounded px-1">
+                      PIN: {DEMO_PINS[emp.id] ?? '????'}
+                    </p>
+                  )}
                 </button>
               )
             })}

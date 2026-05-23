@@ -2,6 +2,20 @@ import React, { useEffect, useRef, useState } from 'react'
 import { isSupabaseConfigured, getCocinaIdPorSlug, getOrdenesPorCocina, suscribirseAOrdenes, actualizarEstadoOrden } from '@pos/supabase'
 import type { CocinaSlug } from '@pos/supabase'
 
+const KDS_CH = 'shakeaholic-kds'
+
+function subscribeKds(handler: (orden: {
+  id: string; folio: string; canal: string; created_at: string
+  items: { id: string; nombre: string; cantidad: number; personalizacion?: string }[]
+}) => void): () => void {
+  try {
+    if (typeof BroadcastChannel === 'undefined') return () => {}
+    const ch = new BroadcastChannel(KDS_CH)
+    ch.onmessage = (m) => { if (m.data?.type === 'new-order') handler(m.data.orden) }
+    return () => { try { ch.close() } catch {} }
+  } catch { return () => {} }
+}
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type EstadoKDS = 'nueva' | 'en_preparacion' | 'lista'
@@ -38,56 +52,56 @@ const now = Date.now()
 const DEMO_ORDENES: Orden[] = [
   {
     id: 'demo-1',
-    folio: 1,
+    folio: 41,
     estado: 'nueva',
-    canal: 'mesa',
-    created_at: new Date(now - 1 * 60 * 1000).toISOString(),
+    canal: 'kiosko',
+    created_at: new Date(now - 2 * 60 * 1000).toISOString(),
     orden_items: [
-      { id: 'i1', cantidad: 2, personalizacion: 'sin cebolla', productos: { id: 'p1', nombre: 'Pechuga a la plancha' } },
-      { id: 'i2', cantidad: 1, personalizacion: null, productos: { id: 'p2', nombre: 'Ensalada César' } },
+      { id: 'i1', cantidad: 2, personalizacion: 'sin azúcar', productos: { id: 'p1', nombre: 'Shake de Fresa' } },
+      { id: 'i2', cantidad: 1, personalizacion: null, productos: { id: 'p2', nombre: 'Cold Brew' } },
     ],
   },
   {
     id: 'demo-2',
-    folio: 2,
+    folio: 42,
     estado: 'nueva',
     canal: 'kiosko',
     created_at: new Date(now - 4 * 60 * 1000).toISOString(),
     orden_items: [
-      { id: 'i3', cantidad: 3, personalizacion: null, productos: { id: 'p3', nombre: 'Hamburguesa clásica' } },
-      { id: 'i4', cantidad: 2, personalizacion: 'extra queso', productos: { id: 'p4', nombre: 'Papas fritas' } },
+      { id: 'i3', cantidad: 1, personalizacion: 'doble proteína', productos: { id: 'p3', nombre: 'Shake Verde' } },
+      { id: 'i4', cantidad: 2, personalizacion: null, productos: { id: 'p4', nombre: 'Energy Bites' } },
     ],
   },
   {
     id: 'demo-3',
-    folio: 3,
+    folio: 43,
     estado: 'en_preparacion',
-    canal: 'delivery',
-    created_at: new Date(now - 5 * 60 * 1000).toISOString(),
+    canal: 'kiosko',
+    created_at: new Date(now - 6 * 60 * 1000).toISOString(),
     orden_items: [
-      { id: 'i5', cantidad: 1, personalizacion: null, productos: { id: 'p5', nombre: 'Pasta Alfredo' } },
-      { id: 'i6', cantidad: 2, personalizacion: null, productos: { id: 'p6', nombre: 'Pan de ajo' } },
+      { id: 'i5', cantidad: 1, personalizacion: null, productos: { id: 'p5', nombre: 'Power Bowl' } },
+      { id: 'i6', cantidad: 1, personalizacion: null, productos: { id: 'p6', nombre: 'Shake de Mango' } },
     ],
   },
   {
     id: 'demo-4',
-    folio: 4,
+    folio: 44,
     estado: 'en_preparacion',
-    canal: 'mesa',
-    created_at: new Date(now - 8 * 60 * 1000).toISOString(),
+    canal: 'pos',
+    created_at: new Date(now - 9 * 60 * 1000).toISOString(),
     orden_items: [
-      { id: 'i7', cantidad: 1, personalizacion: 'término medio', productos: { id: 'p7', nombre: 'Arrachera' } },
+      { id: 'i7', cantidad: 3, personalizacion: null, productos: { id: 'p7', nombre: 'Café Americano' } },
     ],
   },
   {
     id: 'demo-5',
-    folio: 5,
+    folio: 45,
     estado: 'lista',
-    canal: 'mesa',
-    created_at: new Date(now - 12 * 60 * 1000).toISOString(),
+    canal: 'kiosko',
+    created_at: new Date(now - 13 * 60 * 1000).toISOString(),
     orden_items: [
-      { id: 'i8', cantidad: 2, personalizacion: null, productos: { id: 'p8', nombre: 'Tacos de bistec' } },
-      { id: 'i9', cantidad: 1, personalizacion: null, productos: { id: 'p9', nombre: 'Agua de horchata' } },
+      { id: 'i8', cantidad: 1, personalizacion: null, productos: { id: 'p8', nombre: 'Açaí Bowl' } },
+      { id: 'i9', cantidad: 1, personalizacion: null, productos: { id: 'p9', nombre: 'Mix de Nueces' } },
     ],
   },
 ]
@@ -156,11 +170,11 @@ const CANAL_LABELS: Record<Canal, string> = {
   delivery: 'Delivery',
 }
 
-const CANAL_EMOJI: Record<Canal, string> = {
-  pos: '💵',
-  mesa: '🍽️',
-  kiosko: '🖥️',
-  delivery: '🛵',
+const CANAL_ICON: Record<Canal, React.ReactNode> = {
+  pos:      (<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>),
+  mesa:     (<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Z"/><line x1="21" y1="15" x2="21" y2="22"/></svg>),
+  kiosko:   (<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>),
+  delivery: (<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>),
 }
 
 const CANAL_CLASSES: Record<Canal, string> = {
@@ -204,6 +218,30 @@ export function PantallaComandas({ cocinaSlug, titulo, color: _color }: Props) {
       .then(id => { if (id) setCocinaId(id) })
       .catch(console.error)
   }, [cocinaSlug])
+
+  // Always subscribe to BroadcastChannel for live kiosk orders (works in demo + real mode)
+  useEffect(() => {
+    const unsub = subscribeKds((orden) => {
+      setOrdenes((prev) => {
+        if (prev.some((o) => o.id === orden.id)) return prev
+        const newOrden: Orden = {
+          id: orden.id,
+          folio: parseInt(orden.folio) || prev.length + 1,
+          estado: 'nueva',
+          canal: orden.canal as Canal,
+          created_at: orden.created_at,
+          orden_items: orden.items.map((item) => ({
+            id: item.id,
+            cantidad: item.cantidad,
+            personalizacion: item.personalizacion ?? null,
+            productos: { id: item.id, nombre: item.nombre },
+          })),
+        }
+        return [newOrden, ...prev]
+      })
+    })
+    return unsub
+  }, [])
 
   // Load orders and subscribe when cocinaId is available
   useEffect(() => {
@@ -460,7 +498,7 @@ function OrdenCard({ orden, now, isFadingOut, onIniciarPreparacion, onMarcarList
         <span
           className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-sa font-mono text-[11px] uppercase tracking-wider ${CANAL_CLASSES[orden.canal]}`}
         >
-          <span className="text-sm">{CANAL_EMOJI[orden.canal]}</span>
+          {CANAL_ICON[orden.canal]}
           {CANAL_LABELS[orden.canal]}
         </span>
       </div>

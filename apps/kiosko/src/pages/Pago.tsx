@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { crearOrden, agregarPuntosCliente, isSupabaseConfigured } from '@pos/supabase'
 import { useCarrito } from '@/store/carritoStore'
+import { displayOrderPaid, kdsNewOrder } from '@/sync'
 
 type MetodoPago = 'terminal' | 'efectivo'
 type EstadoPago = 'eligiendo' | 'terminal_tap' | 'terminal_procesando' | 'terminal_ok'
@@ -141,6 +142,20 @@ export function Pago() {
     const t1 = setTimeout(() => setEstado('terminal_procesando'), 3000)
     const t2 = setTimeout(() => setEstado('terminal_ok'), 5500)
     const t3 = setTimeout(() => {
+      const folio = folioRef.current ?? String(Math.floor(100 + Math.random() * 900))
+      displayOrderPaid(folio)
+      kdsNewOrder({
+        id: `kiosko-${Date.now()}`,
+        folio,
+        canal: 'kiosko',
+        created_at: new Date().toISOString(),
+        items: items.map((i) => ({
+          id: i.producto_id,
+          nombre: i.nombre,
+          cantidad: i.cantidad,
+          personalizacion: i.personalizacion,
+        })),
+      })
       limpiar()
       navigate('/confirmacion', {
         state: {
@@ -228,10 +243,24 @@ export function Pago() {
       await new Promise((r) => setTimeout(r, 1000))
     }
 
+    const folioFinal = folio ?? String(Math.floor(100 + Math.random() * 900))
+    displayOrderPaid(folioFinal)
+    kdsNewOrder({
+      id: `kiosko-${Date.now()}`,
+      folio: folioFinal,
+      canal: 'kiosko',
+      created_at: new Date().toISOString(),
+      items: itemsSnapshot.map((i) => ({
+        id: i.producto_id,
+        nombre: i.nombre,
+        cantidad: i.cantidad,
+        personalizacion: i.personalizacion,
+      })),
+    })
     limpiar()
     navigate('/confirmacion', {
       state: {
-        folio,
+        folio: folioFinal,
         total: totalOrden,
         metodo: 'efectivo',
         items: itemsSnapshot,
